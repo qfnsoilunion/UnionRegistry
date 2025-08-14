@@ -212,13 +212,15 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Check for existing client
       let existingClient;
       if (clientType === "PRIVATE") {
-        const existing = await storage.searchClients({ pan: validatedData.pan });
+        const privateData = validatedData as z.infer<typeof createPrivateClientSchema>;
+        const existing = await storage.searchClients({ pan: privateData.pan });
         existingClient = existing[0];
       } else {
+        const govData = validatedData as z.infer<typeof createGovernmentClientSchema>;
         const govClientId = generateGovClientId(
-          validatedData.orgName,
-          validatedData.officeCode,
-          validatedData.officialEmailOrLetterNo
+          govData.orgName,
+          govData.officeCode,
+          govData.officialEmailOrLetterNo
         );
         const existing = await storage.searchClients({ govClientId });
         existingClient = existing[0];
@@ -240,7 +242,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       const clientData: any = {
         clientType: validatedData.clientType,
         name: validatedData.name,
-        contactPerson: validatedData.contactPerson || null,
+        contactPerson: (validatedData as any).contactPerson || null,
         mobile: validatedData.mobile || null,
         email: validatedData.email || null,
         address: validatedData.address || null,
@@ -248,12 +250,14 @@ export async function registerRoutes(app: Express): Promise<Server> {
       };
 
       if (clientType === "PRIVATE") {
-        clientData.pan = validatedData.pan;
+        const privateData = validatedData as z.infer<typeof createPrivateClientSchema>;
+        clientData.pan = privateData.pan;
       } else {
+        const govData = validatedData as z.infer<typeof createGovernmentClientSchema>;
         clientData.govClientId = generateGovClientId(
-          validatedData.orgName,
-          validatedData.officeCode,
-          validatedData.officialEmailOrLetterNo
+          govData.orgName,
+          govData.officeCode,
+          govData.officialEmailOrLetterNo
         );
       }
 

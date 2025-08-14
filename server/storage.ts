@@ -193,11 +193,12 @@ export class DatabaseStorage implements IStorage {
     if (query.name) conditions.push(sql`${clients.name} ILIKE ${'%' + query.name + '%'}`);
 
     if (query.vehicle) {
-      return await db
-        .select()
+      const results = await db
+        .select({ clients })
         .from(clients)
         .innerJoin(vehicles, eq(clients.id, vehicles.clientId))
         .where(sql`${vehicles.registrationNumber} ILIKE ${'%' + query.vehicle + '%'}`);
+      return results.map(r => r.clients);
     }
 
     if (conditions.length === 0) return [];
@@ -349,16 +350,15 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAuditLogs(filters?: { entity?: string; entityId?: string }): Promise<AuditLog[]> {
-    let query = db.select().from(auditLogs);
+    let conditions = [];
+    if (filters?.entity) conditions.push(eq(auditLogs.entity, filters.entity));
+    if (filters?.entityId) conditions.push(eq(auditLogs.entityId, filters.entityId));
 
-    if (filters?.entity || filters?.entityId) {
-      let conditions = [];
-      if (filters.entity) conditions.push(eq(auditLogs.entity, filters.entity));
-      if (filters.entityId) conditions.push(eq(auditLogs.entityId, filters.entityId));
-      query = query.where(and(...conditions));
-    }
+    const query = conditions.length > 0 
+      ? db.select().from(auditLogs).where(and(...conditions)).orderBy(desc(auditLogs.createdAt))
+      : db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt));
 
-    return await query.orderBy(desc(auditLogs.createdAt));
+    return await query;
   }
 }
 
