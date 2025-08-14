@@ -1,0 +1,287 @@
+uild a full-stack web app named “Union Registry” for the Kashmir Valley Tank Owners & Petroleum Dealers Association. No authentication. Role selection is a simple “login” chooser that sets a client-side role and shows the right dashboard.
+Tech stack
+	•	Backend: Node.js 20 + Express
+	•	DB: Prisma ORM with SQLite in dev, Postgres optional via env
+	•	Validation: zod on server and client
+	•	Frontend: React 18 + Vite + Tailwind + Framer Motion
+	•	Icons: lucide-react
+	•	Animations:
+	◦	Flowing-oil hero using HTML5 Canvas with metaball blobs + turbulence distortion, requestAnimationFrame
+	◦	Fallback Lottie JSON if prefers-reduced-motion
+	•	Optional map: Leaflet + OSM (lazy-load)
+	•	Tests: Jest (server), Vitest (web)
+	•	Tooling: ESLint, Prettier
+App flow (no auth)
+	•	Home page shows flowing-oil hero, association copy, counters, timeline, leadership, quick search.
+	•	“Login” buttons just set a role in localStorage: role = "ADMIN" or role = "DEALER".
+	•	Nav shows “Admin Dashboard” or “Dealer Dashboard” based on role. If none, show “Choose Role”.
+Content for homepage (use verbatim)
+Title: Kashmir Valley Tank Owners & Petroleum Dealers Association Tagline: Fueling Unity, Protecting Interests, Driving Progress Since line: Since 1995. The united voice of Kashmir’s petroleum trade.
+Mission: We are the collective voice of petroleum dealers and tank owners across the Kashmir Valley. We protect dealer rights, promote fair trade, and ensure that this industry stays strong, local, and ready for the future.
+Legacy: Our foundation was laid by Late Haji Ghulam Mohi-ud-din Rafiquee Sahib, unanimously elected lifelong President. Official registration and bye-laws were undertaken by Mohammed Shafi Khanday with support from the founding members: Haji Abdul Ahad Pandit, Haji Mushtaq Ahmad Rafiquee, Late Nazir Ahmed Bhat, Roshan Lal, Haji Manzoor Ahmed Rafiquee, Ayub Mustafa Bachha, and Haji Iftikhar Hassan Pandit.
+Timeline labels: 1995 founded and vision set 1995 official registration with J and K Government and bye-laws framed 1996 to 2005 advocacy for local-centric trade 2006 to 2015 membership expansion and stronger protections 2016 to present continuing as the united voice of Kashmir’s petroleum industry
+Leadership: Past Presidents: Haji Ghulam Mohi Ud Din Rafiquee; Haji Abdul Ahad Pandit; Haji Mushtaq Ahmed Rafiquee Current Office Bearers: Er. Javed Ahmed Ashai, President; Mr. Mohammad Shafi Khanday, General Secretary; Mr. Majid Mushtaq Rafiquee, Vice President; Mr. Mohd Altaf Pandit, Secretary
+Data model (Prisma)
+Keep persistent union registry across sessions. Use the same schema as below.
+datasource db { provider = env("PRISMA_PROVIDER") } // "sqlite" default
+generator client { provider = "prisma-client-js" }
+
+enum Role { ADMIN DEALER }
+enum DealerStatus { ACTIVE INACTIVE }
+enum EmploymentStatus { ACTIVE INACTIVE }
+enum SeparationType { RESIGNED PERFORMANCE CONDUCT REDUNDANCY OTHER }
+enum ClientType { PRIVATE GOVERNMENT }
+enum LinkStatus { ACTIVE INACTIVE }
+enum TransferStatus { PENDING APPROVED REJECTED CANCELED }
+
+model Dealer {
+  id           String   @id @default(cuid())
+  legalName    String
+  outletName   String
+  location     String
+  status       DealerStatus @default(ACTIVE)
+  employments  EmploymentRecord[]
+  clientLinks  ClientDealerLink[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@index([status])
+  @@index([location])
+}
+
+model Person {
+  id           String   @id @default(cuid())
+  aadhaar      String   @unique
+  name         String
+  mobile       String?
+  email        String?
+  address      String?
+  dateOfBirth  DateTime?
+  employments  EmploymentRecord[]
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  @@index([name])
+  @@index([mobile])
+  @@index([aadhaar])
+}
+
+model EmploymentRecord {
+  id                 String   @id @default(cuid())
+  personId           String
+  dealerId           String
+  dateOfJoining      DateTime
+  dateOfResignation  DateTime?
+  currentStatus      EmploymentStatus @default(ACTIVE)
+  separations        SeparationEvent[]
+  person             Person   @relation(fields: [personId], references: [id])
+  dealer             Dealer   @relation(fields: [dealerId], references: [id])
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+  @@index([dealerId, currentStatus])
+  @@index([personId, currentStatus])
+}
+
+model SeparationEvent {
+  id               String   @id @default(cuid())
+  employmentId     String
+  separationDate   DateTime
+  separationType   SeparationType
+  remarks          String
+  recordedByLabel  String   // store “ADMIN” or “DEALER:<DealerName>” since no auth
+  createdAt        DateTime @default(now())
+  employment       EmploymentRecord @relation(fields: [employmentId], references: [id])
+}
+
+model Client {
+  id            String   @id @default(cuid())
+  clientType    ClientType
+  pan           String?  @unique
+  govClientId   String?  @unique
+  name          String
+  contactPerson String?
+  mobile        String?
+  email         String?
+  address       String?
+  gstin         String?
+  vehicles      Vehicle[]
+  links         ClientDealerLink[]
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  @@index([name])
+  @@index([mobile])
+  @@index([pan])
+  @@index([govClientId])
+}
+
+model Vehicle {
+  id                 String @id @default(cuid())
+  clientId           String
+  registrationNumber String @unique
+  fuelType           String?
+  notes              String?
+  client             Client @relation(fields: [clientId], references: [id])
+}
+
+model ClientDealerLink {
+  id                String   @id @default(cuid())
+  clientId          String
+  dealerId          String
+  status            LinkStatus @default(ACTIVE)
+  dateOfOnboarding  DateTime
+  dateOfOffboarding DateTime?
+  offboardingReason String?
+  remarks           String?
+  client            Client @relation(fields: [clientId], references: [id])
+  dealer            Dealer @relation(fields: [dealerId], references: [id])
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  @@index([clientId, status])
+  @@index([dealerId, status])
+}
+
+model TransferRequest {
+  id           String   @id @default(cuid())
+  clientId     String
+  fromDealerId String
+  toDealerId   String
+  status       TransferStatus @default(PENDING)
+  reason       String?
+  createdAt    DateTime @default(now())
+  decidedAt    DateTime?
+  client       Client @relation(fields: [clientId], references: [id])
+  fromDealer   Dealer @relation("FromDealer", fields: [fromDealerId], references: [id])
+  toDealer     Dealer @relation("ToDealer", fields: [toDealerId], references: [id])
+  @@index([status])
+}
+
+model AuditLog {
+  id        String   @id @default(cuid())
+  actor     String   // “ADMIN” or “DEALER:<DealerName>”
+  action    String
+  entity    String
+  entityId  String
+  metadata  Json?
+  createdAt DateTime @default(now())
+  @@index([entity, entityId])
+}
+Server endpoints (no auth, but pass actor in header)
+All writes must include x-actor header with one of:
+	•	ADMIN
+	•	DEALER:<DealerName>
+Server validates the header and writes it to AuditLog.recordedByLabel or AuditLog.actor. No RBAC, just trust the label.
+	•	GET /api/metrics/home → { activeDealers, activeEmployees, activeClients, todaysJoins, todaysSeparations }
+	•	Dealers
+	◦	POST /api/admin/dealers { legalName, outletName, location }
+	◦	PATCH /api/admin/dealers/:id { status }
+	◦	GET /api/admin/dealers list with filters
+	◦	GET /api/admin/dealers/:id
+	•	Employees
+	◦	POST /api/employees { aadhaar, name, mobile?, email?, address?, dateOfBirth?, dealerId, dateOfJoining }
+	▪	If Aadhaar exists, link. If same Aadhaar active elsewhere, return 409 EMPLOYEE_ACTIVE_ELSEWHERE with { dealerName, since }.
+	◦	GET /api/employees/search?aadhar=|name=|mobile= → person + full union history
+	◦	PATCH /api/employments/:id/end { separationDate, separationType, remarks }
+	•	Clients
+	◦	POST /api/clients
+	▪	Private: { clientType:"PRIVATE", pan, name, mobile?, email?, address?, gstin?, vehicles:[registrationNumber], dealerId }
+	▪	Government: { clientType:"GOVERNMENT", name, contactPerson?, mobile?, email?, address?, gstin?, orgName, officeCode, officialEmailOrLetterNo, vehicles?, dealerId }
+	▪	Server computes govClientId = hash(orgName + officeCode + officialEmailOrLetterNo)
+	▪	Enforce exclusivity. If active elsewhere, 409 CLIENT_ACTIVE_ELSEWHERE with { dealerName, since }.
+	◦	GET /api/clients/search?pan=|govId=|vehicle=|name=|org= → identity + current assignment + history + vehicles
+	◦	POST /api/clients/:id/vehicles add vehicle
+	◦	PATCH /api/client-links/:linkId/offboard { dateOfOffboarding, offboardingReason, remarks? }
+	◦	Transfers:
+	▪	POST /api/transfers { clientId, fromDealerId, toDealerId, reason? }
+	▪	POST /api/transfers/:id/approve
+	▪	POST /api/transfers/:id/reject
+	•	Search aliases:
+	◦	GET /api/search/employee (proxy to employees)
+	◦	GET /api/search/client (proxy to clients)
+	•	GET /api/audit?entity=&id=&page= admin-style listing (public in this build)
+Homepage UI and flowing-oil animation
+	•	Hero with canvas behind the headline. Implement “oil” as:
+	◦	8–12 metaball blobs with per-blob sine motion
+	◦	A full-screen canvas shader pass that applies a mild simplex-noise normal map to distort and “viscosify” the blobs
+	◦	Glossy specular highlights drawn as moving gradient arcs
+	◦	On prefers-reduced-motion, hide canvas and show a low-CPU Lottie gradient mesh
+	•	Quick Search tabs: Employee | Client with inputs
+	•	Live Union Stats strip: animated count-up on scroll, pulled from /api/metrics/home
+	•	“How it works” 3 tiles with small Lottie on hover
+	•	Timeline horizontal snap scroller
+	•	Leadership cards
+	•	Optional Leaflet map (lazy)
+Dealer dashboard (after role chosen = DEALER)
+	•	Cards: active employees, inactive employees, recent joiners, recent separations
+	•	Employees page
+	◦	Add Employee form with consent checkbox
+	◦	Search Employee by Aadhaar/Name/Mobile
+	◦	Person detail with union timeline
+	◦	End Employment modal with required type and remarks
+	•	Clients page
+	◦	Add Client modal Private or Government
+	◦	Private requires PAN and at least one vehicle
+	◦	Government captures orgName, officeCode, officialEmailOrLetterNo, computes govClientId
+	◦	If active elsewhere, show blocking modal:
+	▪	Title: Client already active with another dealer
+	▪	Body: show current dealer and since date
+	▪	Actions: Close, Request Transfer
+	◦	Vehicles sub-section per client
+Admin dashboard (after role chosen = ADMIN)
+	•	Dealers list create, deactivate, view
+	•	Global metrics
+	•	Transfers oversight, approve or reject
+	•	Read-only union views of employees and clients
+Validation
+	•	Aadhaar: 12 digits numeric check
+	•	PAN: [A-Z]{5}[0-9]{4}[A-Z]
+	•	Vehicle: normalize uppercase, basic pattern AA00AA0000 variants allowed
+	•	Government identity bundle required for gov client creation
+	•	All mutations must include x-actor header and log to AuditLog
+Project structure
+server/
+  index.ts
+  app.ts
+  modules/... (admin, employees, clients, search, metrics)
+  utils/{prisma.ts, hash.ts, validators.ts, audit.ts}
+  tests/...
+web/
+  index.html
+  src/
+    main.tsx
+    App.tsx
+    lib/{api.ts, role.ts}
+    routes/{Home.tsx, ChooseRole.tsx, AdminDashboard.tsx, DealerDashboard.tsx, Employees.tsx, EmployeeDetail.tsx, Clients.tsx, ClientDetail.tsx, Transfers.tsx, Search.tsx}
+    components/{Navbar.tsx, Footer.tsx, OilCanvas.tsx, StatsStrip.tsx, QuickSearch.tsx, Timeline.tsx, DataTable.tsx, Modal.tsx, Toast.tsx, Forms/...}
+    assets/lotties/{mesh.json}
+    styles/tailwind.css
+Role selection (fake login)
+	•	Route /role shows two cards: Admin and Dealer
+	•	Clicking sets localStorage.role = "ADMIN" or "DEALER"
+	•	Navbar reads role and shows the right dashboard link
+	•	“Switch role” button in navbar clears the role
+Seeds
+	•	Two dealers: “Hilal Petroleum, Srinagar” and “Bharat Fuel Services, Anantnag”
+	•	Three people with mixed employment across both dealers
+	•	One private client with PAN active with Hilal
+	•	One government client “PWD Kashmir — Unit 04” active with Bharat
+	•	Vehicles for each client
+	•	One pending transfer from Bharat to Hilal
+Tests to include
+Server
+	•	Employee add links existing Aadhaar, blocks if active elsewhere
+	•	End employment requires remarks
+	•	Client private requires PAN and blocks active elsewhere
+	•	Government identity hashing is deterministic Web
+	•	Role chooser sets role and updates nav
+	•	QuickSearch calls correct endpoints per tab
+	•	Add Client form toggles fields for Private vs Government
+	•	Blocking popup renders on CLIENT_ACTIVE_ELSEWHERE
+Scripts
+	•	Root: workspaces for server and web
+	•	npm run dev runs both
+	•	postinstall runs prisma generate
+	•	npm run db:migrate runs prisma migrate dev
+	•	README with steps:
+	1	npm install
+	2	npm run db:migrate
+	3	npm run dev
+	4	Visit /role to choose Admin or Dealer
+Build all of the above now. Keep code clean, commented where logic is non-obvious. No authentication. Role is client-side only. Flowing-oil hero must be smooth on 60 fps on desktop and gracefully degrade on low power devices.
