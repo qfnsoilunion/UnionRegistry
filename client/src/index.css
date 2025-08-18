@@ -4,26 +4,26 @@
 
 :root {
   --background: hsl(0, 0%, 100%);
-  --foreground: hsl(0, 0%, 15%);
-  --card: hsl(0, 0%, 100%);
-  --card-foreground: hsl(0, 0%, 15%);
+  --foreground: hsl(210, 25%, 7.8431%);
+  --card: hsl(180, 6.6667%, 97.0588%);
+  --card-foreground: hsl(210, 25%, 7.8431%);
   --popover: hsl(0, 0%, 100%);
-  --popover-foreground: hsl(0, 0%, 15%);
-  --primary: hsl(200, 100%, 45%);
+  --popover-foreground: hsl(210, 25%, 7.8431%);
+  --primary: hsl(218, 89%, 51%);
   --primary-foreground: hsl(0, 0%, 100%);
-  --secondary: hsl(0, 0%, 96%);
-  --secondary-foreground: hsl(0, 0%, 15%);
-  --muted: hsl(0, 0%, 96%);
-  --muted-foreground: hsl(0, 0%, 45%);
-  --accent: hsl(200, 100%, 95%);
-  --accent-foreground: hsl(200, 100%, 45%);
-  --destructive: hsl(0, 84%, 60%);
+  --secondary: hsl(41, 96%, 49%);
+  --secondary-foreground: hsl(0, 0%, 100%);
+  --muted: hsl(240, 1.9608%, 90%);
+  --muted-foreground: hsl(210, 25%, 7.8431%);
+  --accent: hsl(159, 64%, 40%);
+  --accent-foreground: hsl(0, 0%, 100%);
+  --destructive: hsl(356.3033, 90.5579%, 54.3137%);
   --destructive-foreground: hsl(0, 0%, 100%);
-  --border: hsl(0, 0%, 89%);
-  --input: hsl(0, 0%, 96%);
-  --ring: hsl(200, 100%, 45%);
-  --neutral: hsl(0, 0%, 50%);
-  --radius: 0.375rem;
+  --border: hsl(201.4286, 30.4348%, 90.9804%);
+  --input: hsl(200, 23.0769%, 97.4510%);
+  --ring: hsl(202.8169, 89.1213%, 53.1373%);
+  --neutral: hsl(220, 14%, 48%);
+  --radius: 0.5rem;
 }
 
 .dark {
@@ -65,14 +65,22 @@
 }
 
 @layer components {
-  /* Clean minimalistic components */
-  .card-hover {
-    transition: all 0.3s ease;
+  .oil-blob {
+    filter: blur(2px);
+    animation: float 6s ease-in-out infinite;
   }
-  
-  .card-hover:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+
+  @keyframes float {
+    0%, 100% { 
+      transform: translateY(0px) scale(1); 
+    }
+    50% { 
+      transform: translateY(-20px) scale(1.05); 
+    }
+  }
+
+  .metaball-container {
+    filter: contrast(20) blur(1px);
   }
 
   .count-up {

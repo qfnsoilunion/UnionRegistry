@@ -13,38 +13,6 @@ export const linkStatusEnum = pgEnum("link_status", ["ACTIVE", "INACTIVE"]);
 export const transferStatusEnum = pgEnum("transfer_status", ["PENDING", "APPROVED", "REJECTED", "CANCELED"]);
 
 // Tables
-export const adminUsers = pgTable("admin_users", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  username: varchar("username", { length: 100 }).unique().notNull(),
-  passwordHash: text("password_hash").notNull(),
-  totpSecret: text("totp_secret"),
-  totpEnabled: boolean("totp_enabled").default(false).notNull(),
-  lastLogin: timestamp("last_login"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
-export const dealerProfiles = pgTable("dealer_profiles", {
-  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
-  dealerId: varchar("dealer_id").notNull().unique(),
-  username: varchar("username", { length: 100 }).unique().notNull(),
-  passwordHash: text("password_hash").notNull(),
-  ownerName: text("owner_name").notNull(),
-  phoneNumber: varchar("phone_number", { length: 15 }).notNull(),
-  email: text("email"),
-  profileImage: text("profile_image"),
-  establishedDate: timestamp("established_date"),
-  licenseNumber: varchar("license_number", { length: 100 }),
-  gstNumber: varchar("gst_number", { length: 20 }),
-  bankDetails: jsonb("bank_details"),
-  operationalHours: jsonb("operational_hours"),
-  servicesOffered: text("services_offered").array(),
-  totalEmployees: integer("total_employees").default(0),
-  lastLogin: timestamp("last_login"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-  updatedAt: timestamp("updated_at").defaultNow().notNull(),
-});
-
 export const dealers = pgTable("dealers", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   legalName: text("legal_name").notNull(),
@@ -189,21 +157,6 @@ export const transferRequestsRelations = relations(transferRequests, ({ one }) =
 }));
 
 // Schemas
-export const insertAdminUserSchema = createInsertSchema(adminUsers).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  lastLogin: true,
-});
-
-export const insertDealerProfileSchema = createInsertSchema(dealerProfiles).omit({
-  id: true,
-  createdAt: true,
-  updatedAt: true,
-  lastLogin: true,
-  totalEmployees: true,
-});
-
 export const insertDealerSchema = createInsertSchema(dealers).omit({
   id: true,
   createdAt: true,
@@ -239,12 +192,6 @@ export const insertTransferRequestSchema = createInsertSchema(transferRequests).
 });
 
 // Types
-export type AdminUser = typeof adminUsers.$inferSelect;
-export type InsertAdminUser = z.infer<typeof insertAdminUserSchema>;
-
-export type DealerProfile = typeof dealerProfiles.$inferSelect;
-export type InsertDealerProfile = z.infer<typeof insertDealerProfileSchema>;
-
 export type Dealer = typeof dealers.$inferSelect;
 export type InsertDealer = z.infer<typeof insertDealerSchema>;
 

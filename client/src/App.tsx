@@ -8,11 +8,9 @@ import { roleManager, type Role } from "./lib/role";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import MinimalistHome from "./pages/MinimalistHome";
-import About from "./pages/About";
+import Home from "./pages/Home";
 import ChooseRole from "./pages/ChooseRole";
 import AdminDashboard from "./pages/AdminDashboard";
-import AdminLogin from "./pages/AdminLogin";
 import DealerDashboard from "./pages/DealerDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -33,39 +31,17 @@ function Router() {
     setRole(newRole);
   };
 
-  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
-
-  useEffect(() => {
-    // Check if admin is authenticated
-    const token = localStorage.getItem("adminToken");
-    if (token) {
-      setAdminAuthenticated(true);
-    }
-  }, []);
-
-  const handleAdminLogin = () => {
-    setAdminAuthenticated(true);
-    setRole("ADMIN");
-    window.location.href = "/admin";
-  };
-
-  const [location] = useState(window.location.pathname);
-
   return (
     <div className="min-h-screen flex flex-col">
-      {location !== "/" && location !== "/about" && <Navbar role={role} onRoleChange={updateRole} />}
+      <Navbar role={role} onRoleChange={updateRole} />
       <main className="flex-1">
         <Switch>
-          <Route path="/" component={MinimalistHome} />
-          <Route path="/about" component={About} />
+          <Route path="/" component={Home} />
           <Route path="/role">
             <ChooseRole onRoleSelect={updateRole} />
           </Route>
-          <Route path="/admin/login">
-            <AdminLogin onSuccess={handleAdminLogin} />
-          </Route>
           <Route path="/admin">
-            {adminAuthenticated ? <AdminDashboard /> : <AdminLogin onSuccess={handleAdminLogin} />}
+            {role === "ADMIN" ? <AdminDashboard /> : <ChooseRole onRoleSelect={updateRole} />}
           </Route>
           <Route path="/dealer">
             {role === "DEALER" ? <DealerDashboard /> : <ChooseRole onRoleSelect={updateRole} />}

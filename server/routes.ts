@@ -1,8 +1,6 @@
 import type { Express } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
-import { initializeAdmin, verifyAdminPassword, verifyTOTP, generateTOTPQRCode, enableTOTP, createDealerProfile, verifyDealerPassword } from "./auth";
-import jwt from "jsonwebtoken";
 import { logAudit } from "./utils/audit";
 import { generateGovClientId } from "./utils/hash";
 import {
@@ -14,8 +12,6 @@ import {
 } from "./utils/validators";
 import { z } from "zod";
 
-const JWT_SECRET = process.env.JWT_SECRET || "union-registry-secret-2025";
-
 function getActorFromHeaders(req: any): string {
   const actor = req.headers["x-actor"];
   if (!actor) {
@@ -24,86 +20,7 @@ function getActorFromHeaders(req: any): string {
   return actor as string;
 }
 
-// Authentication middleware
-const authenticateAdmin = (req: any, res: any, next: any) => {
-  const token = req.headers.authorization?.split(' ')[1];
-  
-  if (!token) {
-    return res.status(401).json({ message: "No token provided" });
-  }
-  
-  try {
-    const decoded = jwt.verify(token, JWT_SECRET) as any;
-    req.adminUser = decoded;
-    next();
-  } catch (error) {
-    return res.status(401).json({ message: "Invalid token" });
-  }
-};
-
 export async function registerRoutes(app: Express): Promise<Server> {
-  // Initialize default admin
-  await initializeAdmin();
-  // Admin authentication routes
-  app.post("/api/auth/admin/login", async (req, res) => {
-    const { username, password } = req.body;
-    
-    try {
-      const isValid = await verifyAdminPassword(username, password);
-      
-      if (!isValid) {
-        return res.status(401).json({ message: "Invalid credentials" });
-      }
-      
-      // Generate temporary session token
-      const sessionToken = jwt.sign({ username, type: "session" }, JWT_SECRET, { expiresIn: "5m" });
-      
-      // Check if 2FA is setup
-      const qrCode = await generateTOTPQRCode(username);
-      
-      return res.json({
-        requiresTOTP: true,
-        setupRequired: qrCode !== null && !(await verifyTOTP(username, "000000")), // Check if TOTP is enabled
-        qrCode,
-        token: sessionToken
-      });
-    } catch (error) {
-      console.error("Login error:", error);
-      return res.status(500).json({ message: "Login failed" });
-    }
-  });
-
-  app.post("/api/auth/admin/verify-totp", async (req, res) => {
-    const { username, token, sessionToken, setupMode } = req.body;
-    
-    try {
-      // Verify session token
-      jwt.verify(sessionToken, JWT_SECRET);
-      
-      if (setupMode) {
-        // First time setup - enable TOTP
-        const enabled = await enableTOTP(username, token);
-        if (!enabled) {
-          return res.status(400).json({ message: "Invalid verification code" });
-        }
-      } else {
-        // Regular verification
-        const isValid = await verifyTOTP(username, token);
-        if (!isValid) {
-          return res.status(400).json({ message: "Invalid verification code" });
-        }
-      }
-      
-      // Generate full access token
-      const accessToken = jwt.sign({ username, type: "admin" }, JWT_SECRET, { expiresIn: "24h" });
-      
-      return res.json({ token: accessToken });
-    } catch (error) {
-      console.error("TOTP verification error:", error);
-      return res.status(400).json({ message: "Verification failed" });
-    }
-  });
-
   // Home metrics
   app.get("/api/metrics/home", async (req, res) => {
     try {
