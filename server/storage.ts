@@ -1,5 +1,6 @@
 import {
   dealers,
+  dealerProfiles,
   persons,
   employmentRecords,
   separationEvents,
@@ -9,6 +10,7 @@ import {
   transferRequests,
   auditLogs,
   type Dealer,
+  type DealerProfile,
   type Person,
   type EmploymentRecord,
   type Client,
@@ -16,6 +18,7 @@ import {
   type TransferRequest,
   type AuditLog,
   type InsertDealer,
+  type InsertDealerProfile,
   type InsertPerson,
   type InsertEmploymentRecord,
   type InsertClient,
@@ -31,6 +34,10 @@ export interface IStorage {
   getDealers(): Promise<Dealer[]>;
   getDealerById(id: string): Promise<Dealer | undefined>;
   updateDealerStatus(id: string, status: "ACTIVE" | "INACTIVE"): Promise<Dealer>;
+  
+  // Dealer Profiles
+  getDealerProfiles(): Promise<DealerProfile[]>;
+  getDealerProfileByDealerId(dealerId: string): Promise<DealerProfile | undefined>;
 
   // Persons & Employment
   createPerson(person: InsertPerson): Promise<Person>;
@@ -106,6 +113,15 @@ export class DatabaseStorage implements IStorage {
       .where(eq(dealers.id, id))
       .returning();
     return updated;
+  }
+
+  async getDealerProfiles(): Promise<DealerProfile[]> {
+    return await db.select().from(dealerProfiles).orderBy(dealerProfiles.ownerName);
+  }
+
+  async getDealerProfileByDealerId(dealerId: string): Promise<DealerProfile | undefined> {
+    const [profile] = await db.select().from(dealerProfiles).where(eq(dealerProfiles.dealerId, dealerId));
+    return profile;
   }
 
   async createPerson(person: InsertPerson): Promise<Person> {

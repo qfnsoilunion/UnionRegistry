@@ -8,9 +8,10 @@ import { roleManager, type Role } from "./lib/role";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import Home from "./pages/Home";
+import UltraModernHome from "./pages/UltraModernHome";
 import ChooseRole from "./pages/ChooseRole";
 import AdminDashboard from "./pages/AdminDashboard";
+import AdminLogin from "./pages/AdminLogin";
 import DealerDashboard from "./pages/DealerDashboard";
 import NotFound from "@/pages/not-found";
 
@@ -31,17 +32,38 @@ function Router() {
     setRole(newRole);
   };
 
+  const [adminAuthenticated, setAdminAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check if admin is authenticated
+    const token = localStorage.getItem("adminToken");
+    if (token) {
+      setAdminAuthenticated(true);
+    }
+  }, []);
+
+  const handleAdminLogin = () => {
+    setAdminAuthenticated(true);
+    setRole("ADMIN");
+    window.location.href = "/admin";
+  };
+
+  const [location] = useState(window.location.pathname);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Navbar role={role} onRoleChange={updateRole} />
+      {location !== "/" && <Navbar role={role} onRoleChange={updateRole} />}
       <main className="flex-1">
         <Switch>
-          <Route path="/" component={Home} />
+          <Route path="/" component={UltraModernHome} />
           <Route path="/role">
             <ChooseRole onRoleSelect={updateRole} />
           </Route>
+          <Route path="/admin/login">
+            <AdminLogin onSuccess={handleAdminLogin} />
+          </Route>
           <Route path="/admin">
-            {role === "ADMIN" ? <AdminDashboard /> : <ChooseRole onRoleSelect={updateRole} />}
+            {adminAuthenticated ? <AdminDashboard /> : <AdminLogin onSuccess={handleAdminLogin} />}
           </Route>
           <Route path="/dealer">
             {role === "DEALER" ? <DealerDashboard /> : <ChooseRole onRoleSelect={updateRole} />}
