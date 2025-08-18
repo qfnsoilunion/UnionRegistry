@@ -69,19 +69,6 @@ export default function AddEmployeeForm({ open, onClose, dealerId = "default-dea
 
   const createEmployeeMutation = useMutation({
     mutationFn: (data: Omit<AddEmployeeForm, "consent">) => {
-      // Set actor header for audit logging
-      const originalFetch = window.fetch;
-      window.fetch = (url, options = {}) => {
-        const actorHeader = roleManager.getActorHeader();
-        return originalFetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            ...(actorHeader && { "x-actor": actorHeader }),
-          },
-        });
-      };
-
       return api.createEmployee({
         ...data,
         dealerId,

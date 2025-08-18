@@ -102,19 +102,6 @@ export default function AddClientForm({ open, onClose, dealerId = "default-deale
 
   const createClientMutation = useMutation({
     mutationFn: (data: any) => {
-      // Set actor header for audit logging
-      const originalFetch = window.fetch;
-      window.fetch = (url, options = {}) => {
-        const actorHeader = roleManager.getActorHeader();
-        return originalFetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            ...(actorHeader && { "x-actor": actorHeader }),
-          },
-        });
-      };
-
       // Parse vehicles from textarea
       const vehicles = data.vehicles
         ? data.vehicles.split('\n').map((v: string) => v.trim()).filter(Boolean)

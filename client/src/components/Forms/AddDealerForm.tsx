@@ -45,22 +45,7 @@ export default function AddDealerForm({ open, onClose }: AddDealerFormProps) {
   });
 
   const createDealerMutation = useMutation({
-    mutationFn: (data: AddDealerForm) => {
-      // Set actor header for audit logging
-      const originalFetch = window.fetch;
-      window.fetch = (url, options = {}) => {
-        const actorHeader = roleManager.getActorHeader();
-        return originalFetch(url, {
-          ...options,
-          headers: {
-            ...options.headers,
-            ...(actorHeader && { "x-actor": actorHeader }),
-          },
-        });
-      };
-
-      return api.createDealer(data);
-    },
+    mutationFn: api.createDealer,
     onSuccess: () => {
       toast({
         title: "Success",
