@@ -8,7 +8,8 @@ import { roleManager, type Role } from "./lib/role";
 
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
-import UltraModernHome from "./pages/UltraModernHome";
+import MinimalistHome from "./pages/MinimalistHome";
+import About from "./pages/About";
 import ChooseRole from "./pages/ChooseRole";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminLogin from "./pages/AdminLogin";
@@ -52,10 +53,11 @@ function Router() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      {location !== "/" && <Navbar role={role} onRoleChange={updateRole} />}
+      {location !== "/" && location !== "/about" && <Navbar role={role} onRoleChange={updateRole} />}
       <main className="flex-1">
         <Switch>
-          <Route path="/" component={UltraModernHome} />
+          <Route path="/" component={MinimalistHome} />
+          <Route path="/about" component={About} />
           <Route path="/role">
             <ChooseRole onRoleSelect={updateRole} />
           </Route>
