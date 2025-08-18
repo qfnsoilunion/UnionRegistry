@@ -159,7 +159,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
       // Get employment history for each person
       const results = await Promise.all(
         persons.map(async (person) => {
-          const employments = await storage.getEmploymentsByDealerId(person.id);
+          const employments = await storage.getEmploymentsByPersonId(person.id);
           return { ...person, employments };
         })
       );

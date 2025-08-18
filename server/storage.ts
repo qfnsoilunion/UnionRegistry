@@ -38,6 +38,7 @@ export interface IStorage {
   searchPersons(query: { aadhaar?: string; name?: string; mobile?: string }): Promise<Person[]>;
   createEmploymentRecord(employment: InsertEmploymentRecord): Promise<EmploymentRecord>;
   getEmploymentsByDealerId(dealerId: string): Promise<EmploymentRecord[]>;
+  getEmploymentsByPersonId(personId: string): Promise<EmploymentRecord[]>;
   getActiveEmploymentByPersonId(personId: string): Promise<EmploymentRecord | undefined>;
   endEmployment(employmentId: string, separationData: {
     separationDate: Date;
@@ -135,6 +136,10 @@ export class DatabaseStorage implements IStorage {
 
   async getEmploymentsByDealerId(dealerId: string): Promise<EmploymentRecord[]> {
     return await db.select().from(employmentRecords).where(eq(employmentRecords.dealerId, dealerId));
+  }
+
+  async getEmploymentsByPersonId(personId: string): Promise<EmploymentRecord[]> {
+    return await db.select().from(employmentRecords).where(eq(employmentRecords.personId, personId));
   }
 
   async getActiveEmploymentByPersonId(personId: string): Promise<EmploymentRecord | undefined> {
