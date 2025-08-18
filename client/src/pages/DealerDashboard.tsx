@@ -151,16 +151,13 @@ export default function DealerDashboard() {
       </div>
 
       {/* Sidebar */}
-      <motion.div 
+      <div 
         className={`
           fixed lg:relative lg:translate-x-0 z-40
           w-64 bg-white shadow-sm border-r border-slate-200 h-full
           transform transition-transform duration-300 ease-in-out
           ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
         `}
-        initial={{ x: -100, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.5 }}
       >
         <div className="p-6 border-b border-slate-200">
           <h2 className="font-semibold text-lg text-slate-900">Dealer Portal</h2>
@@ -185,13 +182,14 @@ export default function DealerDashboard() {
             ))}
           </ul>
         </nav>
-      </motion.div>
+      </div>
 
       {/* Overlay for mobile */}
       {sidebarOpen && (
         <div 
           className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
           onClick={() => setSidebarOpen(false)}
+          onTouchEnd={() => setSidebarOpen(false)}
         />
       )}
 
