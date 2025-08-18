@@ -19,7 +19,7 @@ import { api, type HomeMetrics } from "../lib/api";
 import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
 import Timeline from "../components/Timeline";
-import PetrolFilling from "../components/PetrolFilling";
+import SystemCapabilities from "../components/SystemCapabilities";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -132,119 +132,10 @@ export default function Home() {
       {/* Stats Strip */}
       <StatsStrip metrics={metrics} />
 
-      {/* Advanced Fuel Management System */}
-      <motion.section 
-        className="py-16 bg-gradient-to-br from-blue-50 to-indigo-100"
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        transition={{ duration: 0.8 }}
-        viewport={{ once: true }}
-      >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.h2 
-            className="text-3xl font-bold text-center mb-4 text-slate-900"
-            {...fadeInUp}
-          >
-            Revolutionary Digital Fuel Management
-          </motion.h2>
-          <motion.p 
-            className="text-center text-slate-600 mb-12 max-w-3xl mx-auto"
-            {...fadeInUp}
-            transition={{ delay: 0.2 }}
-          >
-            Experience Kashmir Valley's first unified digital ecosystem for petroleum dealers. 
-            Real-time inventory tracking, automated compliance reporting, and intelligent analytics 
-            powered by cutting-edge technology.
-          </motion.p>
-          
-          <motion.div
-            className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center"
-            {...fadeInUp}
-            transition={{ delay: 0.4 }}
-          >
-            <div className="space-y-6">
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                    <Fuel className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Smart Inventory Control</h3>
-                    <p className="text-sm text-slate-600">AI-powered stock prediction</p>
-                  </div>
-                </div>
-                <p className="text-slate-700">
-                  Predictive analytics forecast fuel demand patterns, automatically triggering 
-                  reorder notifications and preventing stockouts across the valley.
-                </p>
-              </div>
+      {/* System Capabilities Showcase */}
+      <SystemCapabilities />
 
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
-                    <Users className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Unified Employee Registry</h3>
-                    <p className="text-sm text-slate-600">Valley-wide workforce management</p>
-                  </div>
-                </div>
-                <p className="text-slate-700">
-                  First-ever centralized system tracking employment history, certifications, 
-                  and transfers across all petroleum outlets in Kashmir Valley.
-                </p>
-              </div>
 
-              <div className="bg-white rounded-xl p-6 shadow-lg">
-                <div className="flex items-center mb-4">
-                  <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
-                    <Shield className="w-6 h-6 text-white" />
-                  </div>
-                  <div className="ml-4">
-                    <h3 className="text-lg font-semibold text-slate-900">Automated Compliance</h3>
-                    <p className="text-sm text-slate-600">Regulatory reporting made simple</p>
-                  </div>
-                </div>
-                <p className="text-slate-700">
-                  Automated generation of regulatory reports, tax filings, and safety compliance 
-                  documentation, saving hours of manual paperwork.
-                </p>
-              </div>
-            </div>
-
-            <div className="relative">
-              <PetrolFilling />
-              <div className="absolute -top-4 -right-4 bg-primary text-white px-3 py-1 rounded-full text-sm font-medium">
-                Live Demo
-              </div>
-            </div>
-          </motion.div>
-
-          {/* Key Metrics */}
-          <motion.div
-            className="mt-16 grid grid-cols-1 md:grid-cols-4 gap-6"
-            {...fadeInUp}
-            transition={{ delay: 0.6 }}
-          >
-            <div className="text-center">
-              <div className="text-3xl font-bold text-primary">98%</div>
-              <div className="text-sm text-slate-600">Accuracy in Inventory</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-secondary">75%</div>
-              <div className="text-sm text-slate-600">Reduction in Paperwork</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-accent">24/7</div>
-              <div className="text-sm text-slate-600">Real-time Monitoring</div>
-            </div>
-            <div className="text-center">
-              <div className="text-3xl font-bold text-neutral">100%</div>
-              <div className="text-sm text-slate-600">Regulatory Compliance</div>
-            </div>
-          </motion.div>
-        </div>
-      </motion.section>
 
       {/* How It Works */}
       <motion.section 
