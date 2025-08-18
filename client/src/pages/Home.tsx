@@ -19,6 +19,7 @@ import { api, type HomeMetrics } from "../lib/api";
 import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
 import Timeline from "../components/Timeline";
+import PetrolFilling from "../components/PetrolFilling";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -130,6 +131,38 @@ export default function Home() {
 
       {/* Stats Strip */}
       <StatsStrip metrics={metrics} />
+
+      {/* Petrol Filling Animation */}
+      <motion.section 
+        className="py-16 bg-gradient-to-br from-slate-50 to-slate-100"
+        initial={{ opacity: 0 }}
+        whileInView={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
+        viewport={{ once: true }}
+      >
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.h2 
+            className="text-3xl font-bold text-center mb-4 text-slate-900"
+            {...fadeInUp}
+          >
+            Interactive Fuel Tank Demo
+          </motion.h2>
+          <motion.p 
+            className="text-center text-slate-600 mb-12 max-w-2xl mx-auto"
+            {...fadeInUp}
+            transition={{ delay: 0.2 }}
+          >
+            Experience our advanced fuel management system with realistic tank filling animations 
+            and real-time monitoring capabilities.
+          </motion.p>
+          <motion.div
+            {...fadeInUp}
+            transition={{ delay: 0.4 }}
+          >
+            <PetrolFilling />
+          </motion.div>
+        </div>
+      </motion.section>
 
       {/* How It Works */}
       <motion.section 
