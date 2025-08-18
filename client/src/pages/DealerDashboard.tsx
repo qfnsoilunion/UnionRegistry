@@ -11,6 +11,8 @@ import {
   UserMinus,
   Truck,
   AlertCircle,
+  Menu,
+  X as CloseIcon,
 } from "lucide-react";
 
 import { api, type HomeMetrics, type Dealer, type Person, type Client, type EmploymentRecord } from "../lib/api";
@@ -34,6 +36,7 @@ export default function DealerDashboard() {
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [showAddClient, setShowAddClient] = useState(false);
   const [currentDealerId, setCurrentDealerId] = useState<string>("");
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [searchParams, setSearchParams] = useState({
     aadhaar: "",
     name: "",
@@ -135,9 +138,26 @@ export default function DealerDashboard() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="bg-white shadow-md"
+        >
+          {sidebarOpen ? <CloseIcon className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        </Button>
+      </div>
+
       {/* Sidebar */}
       <motion.div 
-        className="w-64 bg-white shadow-sm border-r border-slate-200"
+        className={`
+          fixed lg:relative lg:translate-x-0 z-40
+          w-64 bg-white shadow-sm border-r border-slate-200 h-full
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -153,7 +173,10 @@ export default function DealerDashboard() {
                 <Button
                   variant={activeSection === item.id ? "default" : "ghost"}
                   className="w-full justify-start"
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setSidebarOpen(false); // Close sidebar on mobile after selection
+                  }}
                 >
                   <item.icon className="w-4 h-4 mr-3" />
                   {item.label}
@@ -164,73 +187,81 @@ export default function DealerDashboard() {
         </nav>
       </motion.div>
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto lg:ml-0">
         {activeSection === "overview" && (
           <motion.div 
-            className="p-6"
+            className="p-4 lg:p-6 pt-16 lg:pt-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Dashboard Overview</h1>
-              <p className="text-slate-600">Manage your dealership operations</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-slate-900 mb-2">Dashboard Overview</h1>
+              <p className="text-slate-600 text-sm lg:text-base">Manage your dealership operations</p>
             </div>
 
             {/* Quick Stats */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Active Employees</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.activeEmployees || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Active Employees</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.activeEmployees || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-accent rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Active Clients</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.activeClients || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Active Clients</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.activeClients || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                      <Building className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <Building className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Today's Joiners</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.todaysJoins || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Today's Joiners</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.todaysJoins || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
-                      <UserPlus className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <UserPlus className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Today's Separations</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.todaysSeparations || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Today's Separations</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.todaysSeparations || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-neutral rounded-lg flex items-center justify-center">
-                      <UserMinus className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-neutral rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <UserMinus className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
                 </CardContent>
@@ -238,7 +269,7 @@ export default function DealerDashboard() {
             </div>
 
             {/* Recent Activity */}
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 lg:gap-6">
               <Card>
                 <CardHeader>
                   <CardTitle>Recent Employee Actions</CardTitle>

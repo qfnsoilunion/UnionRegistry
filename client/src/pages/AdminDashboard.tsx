@@ -14,6 +14,8 @@ import {
   Check,
   X,
   Shield,
+  Menu,
+  X as CloseIcon,
 } from "lucide-react";
 
 import { api, type HomeMetrics, type Dealer, type TransferRequest } from "../lib/api";
@@ -41,6 +43,7 @@ export default function AdminDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [showDealerProfile, setShowDealerProfile] = useState(false);
   const [selectedDealerForProfile, setSelectedDealerForProfile] = useState<string | null>(null);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const { data: metrics } = useQuery<HomeMetrics>({
     queryKey: ["/api/metrics/home"],
@@ -64,9 +67,26 @@ export default function AdminDashboard() {
 
   return (
     <div className="flex min-h-screen bg-slate-50">
+      {/* Mobile Menu Button */}
+      <div className="lg:hidden fixed top-4 left-4 z-50">
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="bg-white shadow-md"
+        >
+          {sidebarOpen ? <CloseIcon className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        </Button>
+      </div>
+
       {/* Sidebar */}
       <motion.div 
-        className="w-64 bg-white shadow-sm border-r border-slate-200"
+        className={`
+          fixed lg:relative lg:translate-x-0 z-40
+          w-64 bg-white shadow-sm border-r border-slate-200 h-full
+          transform transition-transform duration-300 ease-in-out
+          ${sidebarOpen ? 'translate-x-0' : '-translate-x-full lg:translate-x-0'}
+        `}
         initial={{ x: -100, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
         transition={{ duration: 0.5 }}
@@ -82,7 +102,10 @@ export default function AdminDashboard() {
                 <Button
                   variant={activeSection === item.id ? "default" : "ghost"}
                   className="w-full justify-start"
-                  onClick={() => setActiveSection(item.id)}
+                  onClick={() => {
+                    setActiveSection(item.id);
+                    setSidebarOpen(false); // Close sidebar on mobile after selection
+                  }}
                 >
                   <item.icon className="w-4 h-4 mr-3" />
                   {item.label}
@@ -93,35 +116,43 @@ export default function AdminDashboard() {
         </nav>
       </motion.div>
 
+      {/* Overlay for mobile */}
+      {sidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black bg-opacity-50 z-30 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
+      )}
+
       {/* Main Content */}
-      <div className="flex-1 overflow-auto">
+      <div className="flex-1 overflow-auto lg:ml-0">
         {activeSection === "overview" && (
           <motion.div 
-            className="p-6"
+            className="p-4 lg:p-6 pt-16 lg:pt-6"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">System Overview</h1>
-              <p className="text-slate-600">Monitor and manage the entire union registry</p>
+              <h1 className="text-xl lg:text-2xl font-bold text-slate-900 mb-2">System Overview</h1>
+              <p className="text-slate-600 text-sm lg:text-base">Monitor and manage the entire union registry</p>
             </div>
 
             {/* Metrics Cards */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mb-8">
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Active Dealers</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.activeDealers || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Active Dealers</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.activeDealers || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-primary rounded-lg flex items-center justify-center">
-                      <Store className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-primary rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <Store className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <Badge variant="secondary" className="text-accent bg-accent/10">
+                  <div className="mt-3 lg:mt-4">
+                    <Badge variant="secondary" className="text-accent bg-accent/10 text-xs">
                       <TrendingUp className="w-3 h-3 mr-1" />
                       Active
                     </Badge>
@@ -130,18 +161,18 @@ export default function AdminDashboard() {
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Total Employees</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.activeEmployees || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Total Employees</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.activeEmployees || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-accent rounded-lg flex items-center justify-center">
-                      <Users className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-accent rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <Users className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <Badge variant="secondary" className="text-accent bg-accent/10">
+                  <div className="mt-3 lg:mt-4">
+                    <Badge variant="secondary" className="text-accent bg-accent/10 text-xs">
                       +{metrics?.todaysJoins || 0} today
                     </Badge>
                   </div>
@@ -149,18 +180,18 @@ export default function AdminDashboard() {
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Active Clients</p>
-                      <p className="text-2xl font-bold text-slate-900">{metrics?.activeClients || 0}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Active Clients</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{metrics?.activeClients || 0}</p>
                     </div>
-                    <div className="w-12 h-12 bg-secondary rounded-lg flex items-center justify-center">
-                      <Building className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-secondary rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <Building className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
-                  <div className="mt-4">
-                    <Badge variant="secondary" className="text-accent bg-accent/10">
+                  <div className="mt-3 lg:mt-4">
+                    <Badge variant="secondary" className="text-accent bg-accent/10 text-xs">
                       Active registrations
                     </Badge>
                   </div>
@@ -168,21 +199,21 @@ export default function AdminDashboard() {
               </Card>
 
               <Card>
-                <CardContent className="p-6">
+                <CardContent className="p-4 lg:p-6">
                   <div className="flex items-center justify-between">
-                    <div>
-                      <p className="text-sm font-medium text-slate-600">Pending Transfers</p>
-                      <p className="text-2xl font-bold text-slate-900">{pendingTransfers.length}</p>
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs lg:text-sm font-medium text-slate-600 truncate">Pending Transfers</p>
+                      <p className="text-xl lg:text-2xl font-bold text-slate-900">{pendingTransfers.length}</p>
                     </div>
-                    <div className="w-12 h-12 bg-neutral rounded-lg flex items-center justify-center">
-                      <ArrowRightLeft className="w-6 h-6 text-white" />
+                    <div className="w-10 h-10 lg:w-12 lg:h-12 bg-neutral rounded-lg flex items-center justify-center flex-shrink-0 ml-2">
+                      <ArrowRightLeft className="w-5 h-5 lg:w-6 lg:h-6 text-white" />
                     </div>
                   </div>
-                  <div className="mt-4">
+                  <div className="mt-3 lg:mt-4">
                     {pendingTransfers.length > 0 ? (
-                      <Badge variant="destructive">Requires attention</Badge>
+                      <Badge variant="destructive" className="text-xs">Requires attention</Badge>
                     ) : (
-                      <Badge variant="secondary" className="text-accent bg-accent/10">
+                      <Badge variant="secondary" className="text-accent bg-accent/10 text-xs">
                         All clear
                       </Badge>
                     )}
