@@ -130,20 +130,14 @@ export default function PetrolFilling() {
 
       const { tankX, tankY, tankWidth, tankHeight } = drawTank(width, height);
 
-      // Animate fill level
+      // Animate fill level using refs instead of state
       if (fillLevel.animating) {
         const diff = fillLevel.targetHeight - fillLevel.height;
         if (Math.abs(diff) > 1) {
-          setFillLevel(prev => ({ 
-            ...prev, 
-            height: prev.height + diff * 0.02 
-          }));
+          fillLevel.height += diff * 0.02;
         } else {
-          setFillLevel(prev => ({ 
-            ...prev, 
-            height: prev.targetHeight, 
-            animating: false 
-          }));
+          fillLevel.height = fillLevel.targetHeight;
+          fillLevel.animating = false;
         }
       }
 
@@ -163,22 +157,24 @@ export default function PetrolFilling() {
         cancelAnimationFrame(animationRef.current);
       }
     };
-  }, [fillLevel]);
+  }, []);
 
   const startFilling = () => {
-    setFillLevel(prev => ({ 
-      ...prev, 
+    const newLevel = { 
+      ...fillLevel, 
       targetHeight: 250, 
       animating: true 
-    }));
+    };
+    setFillLevel(newLevel);
   };
 
   const resetTank = () => {
-    setFillLevel({ 
+    const newLevel = { 
       height: 0, 
       targetHeight: 0, 
       animating: false 
-    });
+    };
+    setFillLevel(newLevel);
   };
 
   return (
