@@ -44,7 +44,7 @@ interface AddEmployeeFormProps {
   dealerId?: string;
 }
 
-export default function AddEmployeeForm({ open, onClose, dealerId = "default-dealer-id" }: AddEmployeeFormProps) {
+export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployeeFormProps) {
   const [conflictError, setConflictError] = useState<{
     dealerName: string;
     since: string;
@@ -69,6 +69,9 @@ export default function AddEmployeeForm({ open, onClose, dealerId = "default-dea
 
   const createEmployeeMutation = useMutation({
     mutationFn: (data: Omit<AddEmployeeForm, "consent">) => {
+      if (!dealerId) {
+        throw new Error("Dealer ID is required to add an employee");
+      }
       return api.createEmployee({
         ...data,
         dealerId,

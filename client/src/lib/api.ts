@@ -122,17 +122,13 @@ export const api = {
     return res.json();
   },
 
-  searchEmployees: async (query: {
-    aadhaar?: string;
-    name?: string;
-    mobile?: string;
-  }): Promise<Person[]> => {
-    const params = new URLSearchParams();
-    if (query.aadhaar) params.append("aadhaar", query.aadhaar);
-    if (query.name) params.append("name", query.name);
-    if (query.mobile) params.append("mobile", query.mobile);
+  searchEmployees: async (queryString: string): Promise<any[]> => {
+    const res = await apiRequest("GET", `/api/employees/search?${queryString}`);
+    return res.json();
+  },
 
-    const res = await apiRequest("GET", `/api/employees/search?${params}`);
+  searchClients: async (queryString: string): Promise<Client[]> => {
+    const res = await apiRequest("GET", `/api/clients/search?${queryString}`);
     return res.json();
   },
 
@@ -151,23 +147,7 @@ export const api = {
     return res.json();
   },
 
-  searchClients: async (query: {
-    pan?: string;
-    govId?: string;
-    vehicle?: string;
-    name?: string;
-    org?: string;
-  }): Promise<Client[]> => {
-    const params = new URLSearchParams();
-    if (query.pan) params.append("pan", query.pan);
-    if (query.govId) params.append("govId", query.govId);
-    if (query.vehicle) params.append("vehicle", query.vehicle);
-    if (query.name) params.append("name", query.name);
-    if (query.org) params.append("org", query.org);
 
-    const res = await apiRequest("GET", `/api/clients/search?${params}`);
-    return res.json();
-  },
 
   addVehicle: async (clientId: string, registrationNumber: string): Promise<Vehicle> => {
     const res = await apiRequest("POST", `/api/clients/${clientId}/vehicles`, {

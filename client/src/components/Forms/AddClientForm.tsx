@@ -59,7 +59,7 @@ interface AddClientFormProps {
   dealerId?: string;
 }
 
-export default function AddClientForm({ open, onClose, dealerId = "default-dealer-id" }: AddClientFormProps) {
+export default function AddClientForm({ open, onClose, dealerId }: AddClientFormProps) {
   const [clientType, setClientType] = useState<ClientType>("PRIVATE");
   const [conflictError, setConflictError] = useState<{
     dealerName: string;
@@ -107,6 +107,9 @@ export default function AddClientForm({ open, onClose, dealerId = "default-deale
         ? data.vehicles.split('\n').map((v: string) => v.trim()).filter(Boolean)
         : [];
 
+      if (!dealerId) {
+        throw new Error("Dealer ID is required to add a client");
+      }
       return api.createClient({
         ...data,
         vehicles,
