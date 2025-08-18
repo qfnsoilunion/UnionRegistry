@@ -13,6 +13,7 @@ import {
   UserPlus,
   Check,
   X,
+  Shield,
 } from "lucide-react";
 
 import { api, type HomeMetrics, type Dealer, type TransferRequest } from "../lib/api";
@@ -22,6 +23,8 @@ import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataTable from "../components/DataTable";
 import AddDealerForm from "../components/Forms/AddDealerForm";
+import AdminLogin from "../components/AdminLogin";
+import CreateDealerProfile from "../components/CreateDealerProfile";
 
 const sidebarItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -35,6 +38,9 @@ const sidebarItems = [
 export default function AdminDashboard() {
   const [activeSection, setActiveSection] = useState("overview");
   const [showAddDealer, setShowAddDealer] = useState(false);
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
+  const [showDealerProfile, setShowDealerProfile] = useState(false);
+  const [selectedDealerForProfile, setSelectedDealerForProfile] = useState<string | null>(null);
 
   const { data: metrics } = useQuery<HomeMetrics>({
     queryKey: ["/api/metrics/home"],
@@ -50,6 +56,11 @@ export default function AdminDashboard() {
   });
 
   const pendingTransfers = transfers?.filter(t => t.status === "PENDING") || [];
+
+  // Check if admin is authenticated
+  if (!isAuthenticated) {
+    return <AdminLogin onSuccess={() => setIsAuthenticated(true)} />;
+  }
 
   return (
     <div className="flex min-h-screen bg-slate-50">
@@ -252,6 +263,23 @@ export default function AdminDashboard() {
                           </Badge>
                         ),
                       },
+                      {
+                        header: "Actions",
+                        id: "actions",
+                        cell: ({ row }) => (
+                          <Button
+                            size="sm"
+                            variant="outline"
+                            onClick={() => {
+                              setSelectedDealerForProfile(row.original.id);
+                              setShowDealerProfile(true);
+                            }}
+                          >
+                            <Shield className="w-4 h-4 mr-2" />
+                            Create Profile
+                          </Button>
+                        ),
+                      },
                     ]}
                   />
                 )}
@@ -262,6 +290,18 @@ export default function AdminDashboard() {
               open={showAddDealer}
               onClose={() => setShowAddDealer(false)}
             />
+            
+            {selectedDealerForProfile && (
+              <CreateDealerProfile
+                open={showDealerProfile}
+                onClose={() => {
+                  setShowDealerProfile(false);
+                  setSelectedDealerForProfile(null);
+                }}
+                dealerId={selectedDealerForProfile}
+                dealerName={dealers?.find(d => d.id === selectedDealerForProfile)?.outletName || ""}
+              />
+            )}
           </motion.div>
         )}
 

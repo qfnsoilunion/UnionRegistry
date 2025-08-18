@@ -1,4 +1,4 @@
-import type { Express } from "express";
+import type { Express, Request, Response, NextFunction } from "express";
 import { createServer, type Server } from "http";
 import { storage } from "./storage";
 import { logAudit } from "./utils/audit";
@@ -11,6 +11,14 @@ import {
   createDealerSchema,
 } from "./utils/validators";
 import { z } from "zod";
+import { 
+  initializeAdmin, 
+  verifyAdminPassword, 
+  verifyAdminTotp,
+  createDealerProfile,
+  verifyDealerLogin,
+  verifyDealerTotp
+} from "./auth";
 
 function getActorFromHeaders(req: any): string {
   const actor = req.headers["x-actor"];
@@ -20,7 +28,122 @@ function getActorFromHeaders(req: any): string {
   return actor as string;
 }
 
+// Middleware to check admin authentication
+function requireAdmin(req: Request, res: Response, next: NextFunction) {
+  const adminAuth = req.headers["x-admin-auth"];
+  
+  if (adminAuth !== "true") {
+    return res.status(401).json({ message: "Admin authentication required" });
+  }
+  
+  next();
+}
+
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize admin account on startup
+  await initializeAdmin();
+
+  // Admin authentication routes
+  app.post("/api/admin/verify-password", async (req, res) => {
+    try {
+      const { password } = req.body;
+      const result = await verifyAdminPassword(password);
+      
+      if (result.success) {
+        res.json({
+          success: true,
+          totpEnabled: result.totpEnabled,
+          qrCode: result.qrCode,
+        });
+      } else {
+        res.status(401).json({ message: "Invalid password" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Authentication failed" });
+    }
+  });
+
+  app.post("/api/admin/verify-totp", async (req, res) => {
+    try {
+      const { code, enableTotp } = req.body;
+      const verified = await verifyAdminTotp(code, enableTotp);
+      
+      if (verified) {
+        res.json({ success: true });
+      } else {
+        res.status(401).json({ message: "Invalid 2FA code" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "2FA verification failed" });
+    }
+  });
+
+  // Dealer profile management (admin only)
+  app.post("/api/admin/dealer-profiles", requireAdmin, async (req, res) => {
+    try {
+      const { dealerId, username, password, email, mobile } = req.body;
+      const result = await createDealerProfile(dealerId, username, password, email, mobile);
+      
+      if (result.success) {
+        res.json({ 
+          success: true, 
+          qrCode: result.qrCode,
+          message: "Dealer profile created successfully" 
+        });
+      } else {
+        res.status(400).json({ message: result.error || "Failed to create profile" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Failed to create dealer profile" });
+    }
+  });
+
+  // Dealer login routes
+  app.post("/api/dealer/login", async (req, res) => {
+    try {
+      const { username, password } = req.body;
+      const result = await verifyDealerLogin(username, password);
+      
+      if (result.success) {
+        res.json({
+          success: true,
+          dealerId: result.dealerId,
+          totpEnabled: result.totpEnabled,
+          qrCode: result.qrCode,
+        });
+      } else {
+        res.status(401).json({ message: "Invalid credentials" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Login failed" });
+    }
+  });
+
+  app.post("/api/dealer/verify-totp", async (req, res) => {
+    try {
+      const { username, code, enableTotp } = req.body;
+      const result = await verifyDealerTotp(username, code, enableTotp);
+      
+      if (result.success) {
+        res.json({ success: true, dealerId: result.dealerId });
+      } else {
+        res.status(401).json({ message: "Invalid 2FA code" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "2FA verification failed" });
+    }
+  });
+
+  // Get dealer profiles (admin only)
+  app.get("/api/admin/dealer-profiles", requireAdmin, async (req, res) => {
+    try {
+      const profiles = await storage.getDealerProfiles();
+      res.json(profiles);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch dealer profiles" });
+    }
+  });
+
   // Home metrics
   app.get("/api/metrics/home", async (req, res) => {
     try {

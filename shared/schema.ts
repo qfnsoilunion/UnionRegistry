@@ -23,6 +23,33 @@ export const dealers = pgTable("dealers", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Dealer profiles (login credentials for dealers)
+export const dealerProfiles = pgTable("dealer_profiles", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  dealerId: varchar("dealer_id").notNull().unique(),
+  username: varchar("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  email: text("email").notNull(),
+  mobile: varchar("mobile", { length: 15 }).notNull(),
+  totpSecret: text("totp_secret"),
+  totpEnabled: boolean("totp_enabled").default(false).notNull(),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
+// Admin credentials table
+export const adminAuth = pgTable("admin_auth", {
+  id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
+  username: varchar("username").notNull().unique(),
+  passwordHash: text("password_hash").notNull(),
+  totpSecret: text("totp_secret"),
+  totpEnabled: boolean("totp_enabled").default(false).notNull(),
+  lastLogin: timestamp("last_login"),
+  createdAt: timestamp("created_at").defaultNow().notNull(),
+  updatedAt: timestamp("updated_at").defaultNow().notNull(),
+});
+
 export const persons = pgTable("persons", {
   id: varchar("id").primaryKey().default(sql`gen_random_uuid()`),
   aadhaar: varchar("aadhaar", { length: 12 }).unique().notNull(),
@@ -114,11 +141,16 @@ export const auditLogs = pgTable("audit_logs", {
 });
 
 // Relations
-export const dealersRelations = relations(dealers, ({ many }) => ({
+export const dealersRelations = relations(dealers, ({ one, many }) => ({
+  profile: one(dealerProfiles, { fields: [dealers.id], references: [dealerProfiles.dealerId] }),
   employments: many(employmentRecords),
   clientLinks: many(clientDealerLinks),
   transfersFrom: many(transferRequests, { relationName: "fromDealer" }),
   transfersTo: many(transferRequests, { relationName: "toDealer" }),
+}));
+
+export const dealerProfilesRelations = relations(dealerProfiles, ({ one }) => ({
+  dealer: one(dealers, { fields: [dealerProfiles.dealerId], references: [dealers.id] }),
 }));
 
 export const personsRelations = relations(persons, ({ many }) => ({
@@ -211,3 +243,9 @@ export type TransferRequest = typeof transferRequests.$inferSelect;
 export type InsertTransferRequest = z.infer<typeof insertTransferRequestSchema>;
 
 export type AuditLog = typeof auditLogs.$inferSelect;
+
+export type DealerProfile = typeof dealerProfiles.$inferSelect;
+export type InsertDealerProfile = typeof dealerProfiles.$inferInsert;
+
+export type AdminAuth = typeof adminAuth.$inferSelect;
+export type InsertAdminAuth = typeof adminAuth.$inferInsert;
