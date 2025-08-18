@@ -18,7 +18,6 @@ import {
 import { api, type HomeMetrics } from "../lib/api";
 import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
-import QuickSearch from "../components/QuickSearch";
 import Timeline from "../components/Timeline";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -131,9 +130,6 @@ export default function Home() {
 
       {/* Stats Strip */}
       <StatsStrip metrics={metrics} />
-
-      {/* Quick Search */}
-      <QuickSearch />
 
       {/* How It Works */}
       <motion.section 
