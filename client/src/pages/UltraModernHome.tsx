@@ -1,11 +1,8 @@
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { gsap } from "gsap";
-import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { motion, useScroll, useTransform } from "framer-motion";
+import gsap from "gsap";
 import { useInView } from "react-intersection-observer";
-import { Parallax } from "react-parallax";
 import { useSpring, animated } from "@react-spring/web";
-import Lottie from "lottie-react";
 import { 
   Fuel, 
   Users, 
@@ -29,7 +26,7 @@ import { Card } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { useQuery } from "@tanstack/react-query";
 
-gsap.registerPlugin(ScrollTrigger);
+// ScrollTrigger removed temporarily
 
 // Animated counter component
 function AnimatedCounter({ end, duration = 2000 }: { end: number; duration?: number }) {
@@ -187,7 +184,7 @@ export default function UltraModernHome() {
   });
 
   useEffect(() => {
-    // GSAP animations for sections
+    // Simple GSAP animations without ScrollTrigger
     gsap.fromTo(
       ".feature-card",
       { opacity: 0, y: 50 },
@@ -196,10 +193,7 @@ export default function UltraModernHome() {
         y: 0,
         duration: 1,
         stagger: 0.2,
-        scrollTrigger: {
-          trigger: ".features-section",
-          start: "top 80%",
-        },
+        delay: 1
       }
     );
 
@@ -211,10 +205,7 @@ export default function UltraModernHome() {
         scale: 1,
         duration: 0.8,
         stagger: 0.15,
-        scrollTrigger: {
-          trigger: ".services-section",
-          start: "top 70%",
-        },
+        delay: 1.5
       }
     );
   }, []);
@@ -338,13 +329,7 @@ export default function UltraModernHome() {
 
       {/* About Section */}
       <section id="about" className="relative py-24 px-4 z-10">
-        <Parallax
-          blur={0}
-          bgImage="/api/placeholder/1920/1080"
-          bgImageAlt="Kashmir Valley"
-          strength={200}
-          bgClassName="opacity-20"
-        >
+        <div className="relative">
           <div className="max-w-7xl mx-auto">
             <motion.div
               initial={{ opacity: 0 }}
@@ -396,7 +381,7 @@ export default function UltraModernHome() {
               ))}
             </div>
           </div>
-        </Parallax>
+        </div>
       </section>
 
       {/* Services Section */}
