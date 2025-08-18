@@ -24,7 +24,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataTable from "../components/DataTable";
 import AddDealerForm from "../components/Forms/AddDealerForm";
 import AdminLogin from "../components/AdminLogin";
-import CreateDealerProfile from "../components/CreateDealerProfile";
+// import CreateDealerProfile from "../components/CreateDealerProfile";
 
 const sidebarItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -265,7 +265,6 @@ export default function AdminDashboard() {
                       },
                       {
                         header: "Actions",
-                        id: "actions",
                         cell: ({ row }) => (
                           <Button
                             size="sm"
@@ -291,17 +290,7 @@ export default function AdminDashboard() {
               onClose={() => setShowAddDealer(false)}
             />
             
-            {selectedDealerForProfile && (
-              <CreateDealerProfile
-                open={showDealerProfile}
-                onClose={() => {
-                  setShowDealerProfile(false);
-                  setSelectedDealerForProfile(null);
-                }}
-                dealerId={selectedDealerForProfile}
-                dealerName={dealers?.find(d => d.id === selectedDealerForProfile)?.outletName || ""}
-              />
-            )}
+            {/* Dealer Profile Creation Dialog - temporarily disabled */}
           </motion.div>
         )}
 
