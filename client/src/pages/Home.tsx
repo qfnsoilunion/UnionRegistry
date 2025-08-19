@@ -330,17 +330,6 @@ export default function Home() {
       <footer className="bg-slate-900 text-white py-8">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center">
-            <p className="text-slate-300">
-              © 2025 Kashmir Valley Tank Owners & Petroleum Dealers Association. All rights reserved. | Designed by{" "}
-              <a 
-                href="https://www.quantafons.com" 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="text-secondary hover:text-secondary/80 font-medium transition-colors"
-              >
-                QuantaFONS
-              </a>
-            </p>
           </div>
         </div>
       </footer>
