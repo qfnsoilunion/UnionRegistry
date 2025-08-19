@@ -648,24 +648,29 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Get Kashmir Valley local prices (default)
+  // Get Srinagar local prices (default)
   app.get("/api/oil-prices/local", async (req, res) => {
     try {
+      // Generate realistic price variations
+      const basePrice = 106.80; // Base petrol price for Srinagar
+      const variation = Math.random() * 1.5 - 0.75; // ±0.75 rupee variation
+      const currentPrice = basePrice + variation;
+      
       const kashmirPrices = {
-        location: "Kashmir Valley, India",
+        location: "Srinagar, Jammu and Kashmir",
         currency: "INR",
+        currentPrice: parseFloat(currentPrice.toFixed(2)),
+        previousPrice: parseFloat((currentPrice - 0.40).toFixed(2)),
+        change: "+0.40",
+        changePercent: "+0.37%",
         lastUpdated: new Date().toISOString(),
-        prices: {
-          petrol: {
-            regular: "108.50", // INR per liter
-            premium: "115.80",
-          },
-          diesel: "94.20",
-          lpg: "28.40", // per kg
-        },
-        trend: "stable",
-        changePercent: "+0.8",
-        government_subsidy: true,
+        marketOpen: true,
+        regional: {
+          "Srinagar": parseFloat(currentPrice.toFixed(2)),
+          "Jammu": parseFloat((currentPrice - 0.50).toFixed(2)),
+          "Leh": parseFloat((currentPrice + 1.80).toFixed(2)),
+          "Anantnag": parseFloat((currentPrice + 0.30).toFixed(2)),
+        }
       };
 
       res.json(kashmirPrices);
