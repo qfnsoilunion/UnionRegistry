@@ -55,15 +55,20 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-8 pt-8 text-center">
-          <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
-            &copy; 2025 Kashmir Valley Tank Owners & Petroleum Dealers Association. All rights reserved. | Designed by
-            <img 
-              src={quantaFonsLogo} 
-              alt="QuantaFONS Logo" 
-              className="h-5 w-auto filter brightness-0 invert"
-            />
-            <span className="font-bold">QuantaFONS</span>
-          </p>
+          <div className="flex flex-col md:flex-row md:items-center md:justify-center gap-2 md:gap-4">
+            <p className="text-slate-400 text-sm">
+              &copy; 2025 Kashmir Valley Tank Owners & Petroleum Dealers Association. All rights reserved.
+            </p>
+            <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
+              <span>Designed by</span>
+              <img 
+                src={quantaFonsLogo} 
+                alt="QuantaFONS Logo" 
+                className="h-5 w-auto filter brightness-0 invert"
+              />
+              <span className="font-bold">QuantaFONS</span>
+            </div>
+          </div>
         </div>
       </div>
     </footer>
