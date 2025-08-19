@@ -23,6 +23,9 @@ import { api, type HomeMetrics, type Dealer, type TransferRequest } from "../lib
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import AdminEmployeeManagement from "@/components/AdminEmployeeManagement";
+import AdminClientManagement from "@/components/AdminClientManagement";
+import AuditLogsManagement from "@/components/AuditLogsManagement";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import DataTable from "../components/DataTable";
 import AddDealerForm from "../components/Forms/AddDealerForm";
@@ -341,15 +344,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Employee Management</h1>
-              <p className="text-slate-600">Manage employee records and employment history</p>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-600">Employee management features will be available here.</p>
-              </CardContent>
-            </Card>
+            <AdminEmployeeManagement />
           </motion.div>
         )}
 
@@ -360,15 +355,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Client Management</h1>
-              <p className="text-slate-600">Manage client registrations and relationships</p>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-600">Client management features will be available here.</p>
-              </CardContent>
-            </Card>
+            <AdminClientManagement />
           </motion.div>
         )}
 
@@ -444,15 +431,7 @@ export default function AdminDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Audit Logs</h1>
-              <p className="text-slate-600">Track all administrative actions and system changes</p>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-600">Audit log features will be available here.</p>
-              </CardContent>
-            </Card>
+            <AuditLogsManagement />
           </motion.div>
         )}
       </div>

@@ -1,10 +1,14 @@
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { Users, Building, Search } from "lucide-react";
+import { Users, Building, Search, Phone, Mail, Car, Calendar, MapPin } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Card, CardContent } from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Badge } from "@/components/ui/badge";
+import { format } from "date-fns";
+import { api } from "@/lib/api";
 
 export default function QuickSearch() {
   const [employeeSearch, setEmployeeSearch] = useState({
@@ -20,14 +24,55 @@ export default function QuickSearch() {
     org: "",
   });
 
+  const [employeeSearchTerm, setEmployeeSearchTerm] = useState("");
+  const [clientSearchTerm, setClientSearchTerm] = useState("");
+
+  // Employee search query
+  const { data: employeeResults = [], isLoading: employeeLoading } = useQuery({
+    queryKey: ["employee-search", employeeSearchTerm],
+    enabled: employeeSearchTerm.length >= 3,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (employeeSearchTerm.match(/^\d+$/)) {
+        params.append('aadhaar', employeeSearchTerm);
+      } else if (employeeSearchTerm.includes('+') || employeeSearchTerm.match(/^\d{10}$/)) {
+        params.append('mobile', employeeSearchTerm);
+      } else {
+        params.append('name', employeeSearchTerm);
+      }
+      return fetch(`/api/employees/search?${params}`, {
+        credentials: 'include'
+      }).then(res => res.json());
+    },
+  });
+
+  // Client search query
+  const { data: clientResults = [], isLoading: clientLoading } = useQuery({
+    queryKey: ["client-search", clientSearchTerm],
+    enabled: clientSearchTerm.length >= 3,
+    queryFn: () => {
+      const params = new URLSearchParams();
+      if (clientSearchTerm.match(/^[A-Z]{5}[0-9]{4}[A-Z]$/)) {
+        params.append('pan', clientSearchTerm);
+      } else if (clientSearchTerm.match(/^[A-Z]{2}\d{1,2}[A-Z]{1,2}\d{4}$/)) {
+        params.append('vehicle', clientSearchTerm);
+      } else {
+        params.append('name', clientSearchTerm);
+      }
+      return fetch(`/api/clients/search?${params}`, {
+        credentials: 'include'
+      }).then(res => res.json());
+    },
+  });
+
   const handleEmployeeSearch = () => {
-    // TODO: Implement employee search
-    console.log("Employee search:", employeeSearch);
+    const searchValue = employeeSearch.aadhaar || employeeSearch.name || employeeSearch.mobile;
+    setEmployeeSearchTerm(searchValue);
   };
 
   const handleClientSearch = () => {
-    // TODO: Implement client search  
-    console.log("Client search:", clientSearch);
+    const searchValue = clientSearch.pan || clientSearch.vehicle || clientSearch.name || clientSearch.org;
+    setClientSearchTerm(searchValue);
   };
 
   return (
@@ -91,6 +136,60 @@ export default function QuickSearch() {
                     <Search className="w-4 h-4 mr-2" />
                     Search Employee
                   </Button>
+                  
+                  {employeeSearchTerm && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-4">Search Results</h3>
+                      {employeeLoading ? (
+                        <div className="text-center py-4">Searching employees...</div>
+                      ) : employeeResults.length === 0 ? (
+                        <Card>
+                          <CardContent className="p-4">
+                            <p className="text-slate-600 text-center">No employees found</p>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {employeeResults.map((employee: any) => (
+                            <Card key={employee.id}>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start">
+                                  <div className="space-y-2">
+                                    <h4 className="font-semibold">{employee.name}</h4>
+                                    <p className="text-sm text-slate-600 font-mono">Aadhaar: {employee.aadhaar}</p>
+                                    {employee.mobile && (
+                                      <div className="flex items-center gap-1">
+                                        <Phone className="w-4 h-4" />
+                                        <span className="text-sm">{employee.mobile}</span>
+                                      </div>
+                                    )}
+                                    {employee.email && (
+                                      <div className="flex items-center gap-1">
+                                        <Mail className="w-4 h-4" />
+                                        <span className="text-sm">{employee.email}</span>
+                                      </div>
+                                    )}
+                                  </div>
+                                  <div className="text-right space-y-1">
+                                    {employee.employments && employee.employments.map((emp: any) => (
+                                      <div key={emp.id}>
+                                        <Badge variant={emp.currentStatus === "ACTIVE" ? "default" : "secondary"}>
+                                          {emp.currentStatus}
+                                        </Badge>
+                                        <div className="text-xs text-slate-600 mt-1">
+                                          Since: {format(new Date(emp.dateOfJoining), "MMM yyyy")}
+                                        </div>
+                                      </div>
+                                    ))}
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
                 
                 <TabsContent value="client" className="space-y-4">
@@ -120,6 +219,80 @@ export default function QuickSearch() {
                     <Search className="w-4 h-4 mr-2" />
                     Search Client
                   </Button>
+                  
+                  {clientSearchTerm && (
+                    <div className="mt-6">
+                      <h3 className="text-lg font-semibold mb-4">Search Results</h3>
+                      {clientLoading ? (
+                        <div className="text-center py-4">Searching clients...</div>
+                      ) : clientResults.length === 0 ? (
+                        <Card>
+                          <CardContent className="p-4">
+                            <p className="text-slate-600 text-center">No clients found</p>
+                          </CardContent>
+                        </Card>
+                      ) : (
+                        <div className="space-y-4">
+                          {clientResults.map((client: any) => (
+                            <Card key={client.id}>
+                              <CardContent className="p-4">
+                                <div className="flex justify-between items-start">
+                                  <div className="space-y-2">
+                                    <div className="flex items-center gap-2">
+                                      <h4 className="font-semibold">{client.name}</h4>
+                                      <Badge variant={client.clientType === "PRIVATE" ? "default" : "secondary"}>
+                                        {client.clientType}
+                                      </Badge>
+                                    </div>
+                                    
+                                    {client.clientType === "PRIVATE" && client.pan && (
+                                      <p className="text-sm text-slate-600 font-mono">PAN: {client.pan}</p>
+                                    )}
+                                    
+                                    {client.clientType === "GOVERNMENT" && client.govClientId && (
+                                      <p className="text-sm text-slate-600 font-mono">Org ID: {client.govClientId}</p>
+                                    )}
+                                    
+                                    {client.contactPerson && (
+                                      <p className="text-sm text-slate-600">Contact: {client.contactPerson}</p>
+                                    )}
+                                    
+                                    <div className="flex flex-wrap gap-4">
+                                      {client.mobile && (
+                                        <div className="flex items-center gap-1">
+                                          <Phone className="w-4 h-4" />
+                                          <span className="text-sm">{client.mobile}</span>
+                                        </div>
+                                      )}
+                                      {client.email && (
+                                        <div className="flex items-center gap-1">
+                                          <Mail className="w-4 h-4" />
+                                          <span className="text-sm">{client.email}</span>
+                                        </div>
+                                      )}
+                                      {client.gstin && (
+                                        <div className="text-sm">
+                                          <span className="text-slate-600">GSTIN: </span>
+                                          <span className="font-mono">{client.gstin}</span>
+                                        </div>
+                                      )}
+                                    </div>
+                                  </div>
+                                  
+                                  <div className="text-right">
+                                    <div className="flex items-center gap-1 text-sm text-slate-600">
+                                      <Car className="w-4 h-4" />
+                                      <span>Vehicles on record</span>
+                                    </div>
+                                  </div>
+                                </div>
+                              </CardContent>
+                            </Card>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  )}
                 </TabsContent>
               </Tabs>
             </CardContent>

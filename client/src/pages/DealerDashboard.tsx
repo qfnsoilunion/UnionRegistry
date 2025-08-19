@@ -15,6 +15,8 @@ import { api, type HomeMetrics, type Dealer } from "../lib/api";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import EmployeeManagement from "@/components/EmployeeManagement";
+import ClientManagement from "@/components/ClientManagement";
 import DealerLogin from "../components/DealerLogin";
 import ComplianceTracker from "../components/ComplianceTracker";
 
@@ -263,15 +265,7 @@ export default function DealerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Employee Management</h1>
-              <p className="text-slate-600">Manage your staff and their records</p>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-600">Employee management features will be available here.</p>
-              </CardContent>
-            </Card>
+            <EmployeeManagement dealerId={dealerId} />
           </motion.div>
         )}
 
@@ -282,15 +276,7 @@ export default function DealerDashboard() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="mb-6">
-              <h1 className="text-2xl font-bold text-slate-900 mb-2">Client Management</h1>
-              <p className="text-slate-600">Manage your registered clients</p>
-            </div>
-            <Card>
-              <CardContent className="p-6">
-                <p className="text-slate-600">Client management features will be available here.</p>
-              </CardContent>
-            </Card>
+            <ClientManagement dealerId={dealerId} />
           </motion.div>
         )}
 

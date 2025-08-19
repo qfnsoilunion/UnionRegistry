@@ -43,6 +43,7 @@ export interface IStorage {
   getEmploymentsByDealerId(dealerId: string): Promise<EmploymentRecord[]>;
   getEmploymentsByPersonId(personId: string): Promise<EmploymentRecord[]>;
   getActiveEmploymentByPersonId(personId: string): Promise<EmploymentRecord | undefined>;
+  getEmployeesWithDetailsByDealerId(dealerId: string): Promise<any[]>;
   endEmployment(employmentId: string, separationData: {
     separationDate: Date;
     separationType: "RESIGNED" | "PERFORMANCE" | "CONDUCT" | "REDUNDANCY" | "OTHER";
@@ -56,6 +57,7 @@ export interface IStorage {
   searchClients(query: { pan?: string; govClientId?: string; name?: string; vehicle?: string }): Promise<Client[]>;
   getActiveClientDealerLink(clientId: string): Promise<any>;
   createClientDealerLink(clientId: string, dealerId: string, dateOfOnboarding: Date): Promise<void>;
+  getClientsWithDetailsByDealerId(dealerId: string): Promise<any[]>;
 
   // Vehicles
   createVehicle(vehicle: InsertVehicle): Promise<Vehicle>;
@@ -388,6 +390,42 @@ export class DatabaseStorage implements IStorage {
       : db.select().from(auditLogs).orderBy(desc(auditLogs.createdAt));
 
     return await query;
+  }
+
+  async getEmployeesWithDetailsByDealerId(dealerId: string): Promise<any[]> {
+    const results = await db
+      .select({
+        employment: employmentRecords,
+        person: persons,
+        dealer: dealers,
+      })
+      .from(employmentRecords)
+      .innerJoin(persons, eq(employmentRecords.personId, persons.id))
+      .innerJoin(dealers, eq(employmentRecords.dealerId, dealers.id))
+      .where(eq(employmentRecords.dealerId, dealerId))
+      .orderBy(desc(employmentRecords.createdAt));
+
+    return results;
+  }
+
+  async getClientsWithDetailsByDealerId(dealerId: string): Promise<any[]> {
+    const results = await db
+      .select({
+        client: clients,
+        link: clientDealerLinks,
+        vehicles: sql<Vehicle[]>`COALESCE(JSON_AGG(${vehicles}.*) FILTER (WHERE ${vehicles.id} IS NOT NULL), '[]')`,
+      })
+      .from(clientDealerLinks)
+      .innerJoin(clients, eq(clientDealerLinks.clientId, clients.id))
+      .leftJoin(vehicles, eq(clients.id, vehicles.clientId))
+      .where(and(
+        eq(clientDealerLinks.dealerId, dealerId),
+        eq(clientDealerLinks.status, "ACTIVE")
+      ))
+      .groupBy(clients.id, clientDealerLinks.id)
+      .orderBy(desc(clientDealerLinks.createdAt));
+
+    return results;
   }
 }
 

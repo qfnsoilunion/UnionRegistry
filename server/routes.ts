@@ -564,6 +564,26 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Get employees by dealer
+  app.get("/api/dealers/:dealerId/employees", async (req, res) => {
+    try {
+      const employees = await storage.getEmployeesWithDetailsByDealerId(req.params.dealerId);
+      res.json(employees);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch employees" });
+    }
+  });
+
+  // Get clients by dealer  
+  app.get("/api/dealers/:dealerId/clients", async (req, res) => {
+    try {
+      const clients = await storage.getClientsWithDetailsByDealerId(req.params.dealerId);
+      res.json(clients);
+    } catch (error) {
+      res.status(500).json({ message: "Failed to fetch clients" });
+    }
+  });
+
   // Search aliases
   app.get("/api/search/employee", async (req, res) => {
     return app._router.handle({ ...req, url: "/api/employees/search" }, res);
