@@ -133,7 +133,7 @@ export default function SystemCapabilities() {
         activeTransfers: Math.floor(Math.random() * 5) + 1,
         complianceScore: Math.floor(Math.random() * 10) + 90,
         priceUpdates: Math.floor(Math.random() * 8) + 1,
-        systemUptime: (99 + Math.random()).toFixed(1)
+        systemUptime: parseFloat((99 + Math.random()).toFixed(1))
       }));
     }, 5000);
 

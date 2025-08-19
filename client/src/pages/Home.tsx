@@ -135,8 +135,6 @@ export default function Home() {
       {/* System Capabilities Showcase */}
       <SystemCapabilities />
 
-
-
       {/* How It Works */}
       <motion.section 
         className="py-16 bg-slate-100"

@@ -2,9 +2,9 @@
 
 ## Overview
 
-Union Registry is a full-stack web application serving as a management portal for the Kashmir Valley Tank Owners & Petroleum Dealers Association. The application enables comprehensive management of dealers, employees, clients, and business operations without requiring authentication. Instead, it uses a role-based system where users select between "ADMIN" or "DEALER" roles stored in localStorage.
+Union Registry is a full-stack web application serving as a management portal for the Kashmir Valley Tank Owners & Petroleum Dealers Association. The system provides comprehensive management of dealers, employees, clients, and business operations with advanced security features including password-protected admin access (Union@2025) and 2-factor authentication with QR codes.
 
-The system maintains a unified registry of petroleum dealers and their employees across the Kashmir Valley, providing tools for employee management, client registration, transfer processing, and audit logging. The homepage showcases the association's history, leadership, and provides quick search functionality.
+The application uses a role-based system where users can access either ADMIN or DEALER portals. The system maintains a unified registry of petroleum dealers and their employees across the Kashmir Valley, providing tools for employee management, client registration, transfer processing, and audit logging. The homepage features sophisticated petrol fuel flowing animations and showcases the association's history, leadership, and advanced system capabilities instead of search functionality (removed per user request).
 
 ## User Preferences
 
@@ -16,13 +16,16 @@ Preferred communication style: Simple, everyday language.
 - Built with React 18 + Vite for modern development workflow
 - Styled using Tailwind CSS with shadcn/ui components for consistent UI
 - Framer Motion provides smooth animations and transitions
-- Canvas-based oil flow animation for the hero section with metaball effects
-- Responsive design with mobile-first approach
+- Advanced canvas-based fuel flowing animations with realistic streams and particle effects
+- Interactive System Capabilities showcase with live transfer management, compliance tracking, and price monitoring
+- Responsive design with mobile-first approach and touch-optimized interactions
 - Client-side routing using Wouter for lightweight navigation
 
 **Backend Architecture**
 - Express.js server with TypeScript for type safety
 - RESTful API design with structured route handling
+- Password-protected admin authentication with bcrypt hashing
+- 2-factor authentication using TOTP with QR code generation
 - Request/response logging middleware for debugging
 - Error handling with standardized JSON responses
 - Audit logging system for tracking all administrative actions
@@ -36,7 +39,8 @@ Preferred communication style: Simple, everyday language.
 **State Management**
 - TanStack React Query for server state management and caching
 - Local state management with React hooks
-- Role persistence in localStorage without authentication requirements
+- Role persistence in localStorage for admin/dealer portal selection
+- Live metrics updates every 5 seconds for system capabilities demonstration
 
 **UI/UX Design**
 - Professional business application interface
