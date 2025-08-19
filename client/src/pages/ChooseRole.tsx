@@ -20,7 +20,7 @@ export default function ChooseRole({ onRoleSelect }: ChooseRoleProps) {
     if (role === "ADMIN") {
       window.location.href = "/admin";
     } else {
-      window.location.href = "/dealer";
+      window.location.href = "/dealer-login";
     }
   };
 

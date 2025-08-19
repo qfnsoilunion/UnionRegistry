@@ -17,7 +17,9 @@ import {
   verifyAdminTotp,
   createDealerProfile,
   verifyDealerLogin,
-  verifyDealerTotp
+  verifyDealerTotp,
+  changeDealerPassword,
+  resetDealerPassword
 } from "./auth";
 
 function getActorFromHeaders(req: any): string {
@@ -110,6 +112,7 @@ export async function registerRoutes(app: Express): Promise<Server> {
           dealerId: result.dealerId,
           totpEnabled: result.totpEnabled,
           qrCode: result.qrCode,
+          temporaryPassword: result.temporaryPassword,
         });
       } else {
         res.status(401).json({ message: "Invalid credentials" });
@@ -131,6 +134,42 @@ export async function registerRoutes(app: Express): Promise<Server> {
       }
     } catch (error) {
       res.status(500).json({ message: "2FA verification failed" });
+    }
+  });
+
+  // Change dealer password
+  app.post("/api/dealer/change-password", async (req, res) => {
+    try {
+      const { username, newPassword } = req.body;
+      const result = await changeDealerPassword(username, newPassword);
+      
+      if (result.success) {
+        res.json({ success: true, message: "Password changed successfully" });
+      } else {
+        res.status(400).json({ message: result.error || "Failed to change password" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Password change failed" });
+    }
+  });
+
+  // Admin reset dealer password
+  app.post("/api/admin/reset-dealer-password", requireAdmin, async (req, res) => {
+    try {
+      const { dealerId } = req.body;
+      const result = await resetDealerPassword(dealerId);
+      
+      if (result.success) {
+        res.json({ 
+          success: true, 
+          newPassword: result.newPassword,
+          message: "Password reset successfully" 
+        });
+      } else {
+        res.status(400).json({ message: result.error || "Failed to reset password" });
+      }
+    } catch (error) {
+      res.status(500).json({ message: "Password reset failed" });
     }
   });
 

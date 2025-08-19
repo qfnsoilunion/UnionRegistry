@@ -33,6 +33,7 @@ export const dealerProfiles = pgTable("dealer_profiles", {
   mobile: varchar("mobile", { length: 15 }).notNull(),
   totpSecret: text("totp_secret"),
   totpEnabled: boolean("totp_enabled").default(false).notNull(),
+  temporaryPassword: boolean("temporary_password").default(true).notNull(),
   lastLogin: timestamp("last_login"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),

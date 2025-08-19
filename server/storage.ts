@@ -122,6 +122,7 @@ export class DatabaseStorage implements IStorage {
         mobile: dealerProfiles.mobile,
         totpSecret: dealerProfiles.totpSecret,
         totpEnabled: dealerProfiles.totpEnabled,
+        temporaryPassword: dealerProfiles.temporaryPassword,
         lastLogin: dealerProfiles.lastLogin,
         createdAt: dealerProfiles.createdAt,
         updatedAt: dealerProfiles.updatedAt,

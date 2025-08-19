@@ -110,7 +110,7 @@ export async function verifyAdminTotp(code: string, enableTotp = false): Promise
   }
 }
 
-// Create dealer profile
+// Create dealer profile with temporary password flag
 export async function createDealerProfile(
   dealerId: string,
   username: string,
@@ -147,6 +147,7 @@ export async function createDealerProfile(
       mobile,
       totpSecret: secret.base32,
       totpEnabled: false,
+      temporaryPassword: true,
     });
 
     // Generate QR code for 2FA setup
@@ -175,6 +176,7 @@ export async function verifyDealerLogin(
   dealerId?: string;
   totpEnabled?: boolean;
   qrCode?: string;
+  temporaryPassword?: boolean;
 }> {
   try {
     const [profile] = await db.select().from(dealerProfiles).where(eq(dealerProfiles.username, username));
@@ -199,10 +201,21 @@ export async function verifyDealerLogin(
       });
 
       const qrCode = await QRCode.toDataURL(otpauthUrl);
-      return { success: true, dealerId: profile.dealerId, totpEnabled: false, qrCode };
+      return { 
+        success: true, 
+        dealerId: profile.dealerId, 
+        totpEnabled: false, 
+        qrCode,
+        temporaryPassword: profile.temporaryPassword 
+      };
     }
 
-    return { success: true, dealerId: profile.dealerId, totpEnabled: profile.totpEnabled };
+    return { 
+      success: true, 
+      dealerId: profile.dealerId, 
+      totpEnabled: profile.totpEnabled,
+      temporaryPassword: profile.temporaryPassword 
+    };
   } catch (error) {
     console.error("Dealer login error:", error);
     return { success: false };
@@ -247,5 +260,71 @@ export async function verifyDealerTotp(
   } catch (error) {
     console.error("Dealer TOTP verification error:", error);
     return { success: false };
+  }
+}
+
+// Change dealer password (for first-time login or admin reset)
+export async function changeDealerPassword(
+  username: string,
+  newPassword: string
+): Promise<{ success: boolean; error?: string }> {
+  try {
+    const [profile] = await db.select().from(dealerProfiles).where(eq(dealerProfiles.username, username));
+    
+    if (!profile) {
+      return { success: false, error: "Dealer profile not found" };
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await db
+      .update(dealerProfiles)
+      .set({ 
+        passwordHash,
+        temporaryPassword: false,
+        updatedAt: new Date()
+      })
+      .where(eq(dealerProfiles.username, username));
+
+    return { success: true };
+  } catch (error) {
+    console.error("Password change error:", error);
+    return { success: false, error: "Failed to change password" };
+  }
+}
+
+// Admin reset dealer password (generates new temporary password)
+export async function resetDealerPassword(
+  dealerId: string
+): Promise<{ success: boolean; newPassword?: string; error?: string }> {
+  try {
+    const [profile] = await db.select().from(dealerProfiles).where(eq(dealerProfiles.dealerId, dealerId));
+    
+    if (!profile) {
+      return { success: false, error: "Dealer profile not found" };
+    }
+
+    // Generate new temporary password
+    const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+    let newPassword = "";
+    for (let i = 0; i < 10; i++) {
+      newPassword += chars.charAt(Math.floor(Math.random() * chars.length));
+    }
+
+    const passwordHash = await bcrypt.hash(newPassword, 10);
+    
+    await db
+      .update(dealerProfiles)
+      .set({ 
+        passwordHash,
+        temporaryPassword: true,
+        updatedAt: new Date()
+      })
+      .where(eq(dealerProfiles.dealerId, dealerId));
+
+    return { success: true, newPassword };
+  } catch (error) {
+    console.error("Password reset error:", error);
+    return { success: false, error: "Failed to reset password" };
   }
 }

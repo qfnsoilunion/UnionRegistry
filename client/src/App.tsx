@@ -12,6 +12,7 @@ import Home from "./pages/Home";
 import ChooseRole from "./pages/ChooseRole";
 import AdminDashboard from "./pages/AdminDashboard";
 import DealerDashboard from "./pages/DealerDashboard";
+import DealerLogin from "./components/DealerLogin";
 import NotFound from "@/pages/not-found";
 
 function Router() {
@@ -42,6 +43,13 @@ function Router() {
           </Route>
           <Route path="/admin">
             {role === "ADMIN" ? <AdminDashboard /> : <ChooseRole onRoleSelect={updateRole} />}
+          </Route>
+          <Route path="/dealer-login">
+            <DealerLogin onSuccess={(dealerId) => {
+              updateRole("DEALER");
+              sessionStorage.setItem("dealerId", dealerId);
+              window.location.href = "/dealer";
+            }} />
           </Route>
           <Route path="/dealer">
             {role === "DEALER" ? <DealerDashboard /> : <ChooseRole onRoleSelect={updateRole} />}
