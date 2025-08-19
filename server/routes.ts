@@ -652,6 +652,132 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Find similar employees across other dealers
+  app.get("/api/employees/similar", async (req, res) => {
+    try {
+      const { name, mobile, email, dealerId } = req.query;
+      
+      if (!dealerId) {
+        return res.status(400).json({ message: "Dealer ID is required" });
+      }
+      
+      const filters: any = {};
+      if (name && typeof name === 'string') {
+        filters.name = name;
+      }
+      if (mobile && typeof mobile === 'string') {
+        filters.mobile = mobile;
+      }
+      if (email && typeof email === 'string') {
+        filters.email = email;
+      }
+      
+      // Get all employees from all dealers
+      const allEmployees = await storage.getAllEmployeesWithDetails();
+      const similarEmployees = allEmployees.filter((empData: any) => {
+        // Exclude current dealer's employees
+        if (empData.employment.dealerId === dealerId) return false;
+        
+        // Check for similar name (partial match)
+        if (filters.name && empData.person.name.toLowerCase().includes(filters.name.toLowerCase())) {
+          return true;
+        }
+        
+        // Check for exact mobile match
+        if (filters.mobile && empData.person.mobile === filters.mobile) {
+          return true;
+        }
+        
+        // Check for exact email match
+        if (filters.email && empData.person.email === filters.email) {
+          return true;
+        }
+        
+        return false;
+      });
+      
+      // Enrich with dealer names
+      const enrichedEmployees = similarEmployees.map((empData: any) => {
+        return {
+          ...empData,
+          dealerName: empData.dealer.legalName || 'Unknown Dealer'
+        };
+      });
+      
+      res.json(enrichedEmployees.slice(0, 5)); // Limit to 5 matches
+    } catch (error) {
+      console.error('Error finding similar employees:', error);
+      res.status(500).json({ message: "Failed to find similar employees" });
+    }
+  });
+  
+  // Find similar clients across other dealers
+  app.get("/api/clients/similar", async (req, res) => {
+    try {
+      const { name, mobile, email, pan, dealerId } = req.query;
+      
+      if (!dealerId) {
+        return res.status(400).json({ message: "Dealer ID is required" });
+      }
+      
+      const filters: any = {};
+      if (name && typeof name === 'string') {
+        filters.name = name;
+      }
+      if (mobile && typeof mobile === 'string') {
+        filters.mobile = mobile;
+      }
+      if (email && typeof email === 'string') {
+        filters.email = email;
+      }
+      if (pan && typeof pan === 'string') {
+        filters.pan = pan;
+      }
+      
+      // Get all clients from all dealers
+      const allClients = await storage.getAllClientsWithDetails();
+      const similarClients = allClients.filter((clientData: any) => {
+        // Exclude current dealer's clients
+        if (clientData.link.dealerId === dealerId) return false;
+        
+        // Check for similar name (partial match)
+        if (filters.name && clientData.client.name.toLowerCase().includes(filters.name.toLowerCase())) {
+          return true;
+        }
+        
+        // Check for exact mobile match
+        if (filters.mobile && clientData.client.mobile === filters.mobile) {
+          return true;
+        }
+        
+        // Check for exact email match
+        if (filters.email && clientData.client.email === filters.email) {
+          return true;
+        }
+        
+        // Check for exact PAN match
+        if (filters.pan && clientData.client.pan === filters.pan) {
+          return true;
+        }
+        
+        return false;
+      });
+      
+      // Enrich with dealer names
+      const enrichedClients = similarClients.map((clientData: any) => {
+        return {
+          ...clientData,
+          dealerName: clientData.dealer.legalName || 'Unknown Dealer'
+        };
+      });
+      
+      res.json(enrichedClients.slice(0, 5)); // Limit to 5 matches
+    } catch (error) {
+      console.error('Error finding similar clients:', error);
+      res.status(500).json({ message: "Failed to find similar clients" });
+    }
+  });
+
   // Get Srinagar local prices (default)  
   app.get("/api/oil-prices/local", async (req, res) => {
     try {

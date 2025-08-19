@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -24,6 +24,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import SimilarMatches from "../SimilarMatches";
 
 const addEmployeeSchema = z.object({
   aadhaar: z.string().regex(/^\d{12}$/, "Aadhaar must be 12 digits"),
@@ -49,6 +50,12 @@ export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployee
     dealerName: string;
     since: string;
   } | null>(null);
+  const [searchData, setSearchData] = useState({
+    name: "",
+    mobile: "",
+    email: ""
+  });
+  const [hasSimilarMatches, setHasSimilarMatches] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -66,6 +73,14 @@ export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployee
       consent: false,
     },
   });
+
+  // Watch form values for similarity search
+  const watchedValues = form.watch(["name", "mobile", "email"]);
+  
+  useEffect(() => {
+    const [name, mobile, email] = watchedValues;
+    setSearchData({ name: name || "", mobile: mobile || "", email: email || "" });
+  }, [watchedValues]);
 
   const createEmployeeMutation = useMutation({
     mutationFn: (data: Omit<AddEmployeeForm, "consent">) => {
@@ -121,6 +136,8 @@ export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployee
   const handleClose = () => {
     form.reset();
     setConflictError(null);
+    setSearchData({ name: "", mobile: "", email: "" });
+    setHasSimilarMatches(false);
     onClose();
   };
 
@@ -147,6 +164,15 @@ export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployee
 
         <Form {...form}>
           <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
+            {/* Similar Employees Warning */}
+            {dealerId && (
+              <SimilarMatches 
+                type="employee"
+                searchData={searchData}
+                dealerId={dealerId}
+                onMatchFound={setHasSimilarMatches}
+              />
+            )}
             {/* Employee Consent */}
             <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
               <FormField
@@ -284,8 +310,9 @@ export default function AddEmployeeForm({ open, onClose, dealerId }: AddEmployee
                 type="submit" 
                 disabled={createEmployeeMutation.isPending}
                 className="min-w-[120px]"
+                variant={hasSimilarMatches ? "destructive" : "default"}
               >
-                {createEmployeeMutation.isPending ? "Adding..." : "Add Employee"}
+                {createEmployeeMutation.isPending ? "Adding..." : hasSimilarMatches ? "Add Despite Matches" : "Add Employee"}
               </Button>
             </div>
           </form>

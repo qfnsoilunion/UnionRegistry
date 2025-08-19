@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -23,6 +23,7 @@ import {
   FormMessage,
 } from "@/components/ui/form";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import SimilarMatches from "../SimilarMatches";
 
 const privateClientSchema = z.object({
   clientType: z.literal("PRIVATE"),
@@ -65,6 +66,13 @@ export default function AddClientForm({ open, onClose, dealerId }: AddClientForm
     dealerName: string;
     since: string;
   } | null>(null);
+  const [searchData, setSearchData] = useState({
+    name: "",
+    mobile: "",
+    email: "",
+    pan: ""
+  });
+  const [hasSimilarMatches, setHasSimilarMatches] = useState(false);
 
   const { toast } = useToast();
   const queryClient = useQueryClient();
@@ -99,6 +107,20 @@ export default function AddClientForm({ open, onClose, dealerId }: AddClientForm
       vehicles: "",
     },
   });
+
+  // Watch form values for similarity search
+  const privateWatchedValues = privateForm.watch(["name", "mobile", "email", "pan"]);
+  const governmentWatchedValues = governmentForm.watch(["name", "mobile", "email"]);
+  
+  useEffect(() => {
+    if (clientType === "PRIVATE") {
+      const [name, mobile, email, pan] = privateWatchedValues;
+      setSearchData({ name: name || "", mobile: mobile || "", email: email || "", pan: pan || "" });
+    } else {
+      const [name, mobile, email] = governmentWatchedValues;
+      setSearchData({ name: name || "", mobile: mobile || "", email: email || "", pan: "" });
+    }
+  }, [clientType, privateWatchedValues, governmentWatchedValues]);
 
   const createClientMutation = useMutation({
     mutationFn: (data: any) => {
@@ -168,6 +190,8 @@ export default function AddClientForm({ open, onClose, dealerId }: AddClientForm
   const handleClose = () => {
     resetForms();
     setConflictError(null);
+    setSearchData({ name: "", mobile: "", email: "", pan: "" });
+    setHasSimilarMatches(false);
     onClose();
   };
 
@@ -183,6 +207,16 @@ export default function AddClientForm({ open, onClose, dealerId }: AddClientForm
     <>
       <Modal isOpen={open} onClose={handleClose} title="Add New Client" size="xl">
         <div className="p-6">
+          {/* Similar Clients Warning */}
+          {dealerId && (
+            <SimilarMatches 
+              type="client"
+              searchData={searchData}
+              dealerId={dealerId}
+              onMatchFound={setHasSimilarMatches}
+            />
+          )}
+          
           {/* Conflict Error Alert */}
           {conflictError && (
             <motion.div
@@ -502,8 +536,9 @@ export default function AddClientForm({ open, onClose, dealerId }: AddClientForm
               onClick={onSubmit}
               disabled={createClientMutation.isPending}
               className="min-w-[120px]"
+              variant={hasSimilarMatches ? "destructive" : "default"}
             >
-              {createClientMutation.isPending ? "Adding..." : "Add Client"}
+              {createClientMutation.isPending ? "Adding..." : hasSimilarMatches ? "Add Despite Matches" : "Add Client"}
             </Button>
           </div>
         </div>
