@@ -47,7 +47,7 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary to-blue-900 text-white overflow-hidden min-h-screen">
+      <section className="relative bg-gradient-to-br from-primary to-blue-900 text-white overflow-hidden py-16 lg:py-24">
         {/* Background Image with Overlay */}
         <div 
           className="absolute inset-0 bg-cover bg-center bg-no-repeat"
@@ -100,9 +100,9 @@ export default function Home() {
           </div>
         </motion.div>
 
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
-            className="text-center mb-16"
+            className="text-center"
             {...fadeInUp}
           >
             <motion.h1 

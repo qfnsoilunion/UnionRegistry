@@ -179,10 +179,10 @@ export default function OilPriceTracker() {
                   <div className="space-y-3">
                     <div className="bg-white/5 rounded-lg p-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-blue-200 text-sm">Regular</span>
+                        <span className="text-blue-200 text-sm antialiased">Regular</span>
                         <div className="flex items-center gap-1">
                           {getCurrencyIcon(displayPrices.currency)}
-                          <span className="text-white font-bold">
+                          <span className="text-white font-bold text-lg antialiased tracking-tight">
                             {displayPrices.prices.petrol.regular}
                           </span>
                         </div>
@@ -190,10 +190,10 @@ export default function OilPriceTracker() {
                     </div>
                     <div className="bg-white/5 rounded-lg p-4">
                       <div className="flex items-center justify-between">
-                        <span className="text-blue-200 text-sm">Premium</span>
+                        <span className="text-blue-200 text-sm antialiased">Premium</span>
                         <div className="flex items-center gap-1">
                           {getCurrencyIcon(displayPrices.currency)}
-                          <span className="text-white font-bold">
+                          <span className="text-white font-bold text-lg antialiased tracking-tight">
                             {displayPrices.prices.petrol.premium}
                           </span>
                         </div>
@@ -210,10 +210,10 @@ export default function OilPriceTracker() {
                   </div>
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-blue-200 text-sm">Per Liter</span>
+                      <span className="text-blue-200 text-sm antialiased">Per Liter</span>
                       <div className="flex items-center gap-1">
                         {getCurrencyIcon(displayPrices.currency)}
-                        <span className="text-white font-bold">
+                        <span className="text-white font-bold text-lg antialiased tracking-tight">
                           {displayPrices.prices.diesel}
                         </span>
                       </div>
@@ -229,12 +229,12 @@ export default function OilPriceTracker() {
                   </div>
                   <div className="bg-white/5 rounded-lg p-4">
                     <div className="flex items-center justify-between">
-                      <span className="text-blue-200 text-sm">
+                      <span className="text-blue-200 text-sm antialiased">
                         Per {displayPrices.currency === "INR" ? "Kg" : "Liter"}
                       </span>
                       <div className="flex items-center gap-1">
                         {getCurrencyIcon(displayPrices.currency)}
-                        <span className="text-white font-bold">
+                        <span className="text-white font-bold text-lg antialiased tracking-tight">
                           {displayPrices.prices.lpg}
                         </span>
                       </div>
@@ -249,14 +249,14 @@ export default function OilPriceTracker() {
               <div className="flex items-center justify-center gap-4">
                 <div className="flex items-center gap-2">
                   {getTrendIcon(displayPrices.trend)}
-                  <span className="text-white font-medium">
+                  <span className="text-white font-medium antialiased">
                     {displayPrices.changePercent}% 
                     {displayPrices.trend === "up" && " increase"}
                     {displayPrices.trend === "down" && " decrease"}
                     {displayPrices.trend === "stable" && " change"}
                   </span>
                 </div>
-                <span className="text-blue-200 text-sm">from last week</span>
+                <span className="text-blue-200 text-sm antialiased">from last week</span>
               </div>
             </CardContent>
           </Card>
