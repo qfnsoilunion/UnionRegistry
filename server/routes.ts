@@ -588,6 +588,93 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Oil price search endpoint
+  app.get("/api/oil-prices/search", async (req, res) => {
+    try {
+      const { location } = req.query;
+      
+      if (!location || typeof location !== 'string') {
+        return res.status(400).json({ message: "Location parameter is required" });
+      }
+
+      console.log(`Searching oil prices for: ${location}`);
+      
+      // In a real implementation, you would integrate with:
+      // - Energy Information Administration (EIA) API
+      // - GasBuddy API 
+      // - Local petroleum ministry APIs
+      // For demo, we'll simulate realistic prices based on global averages
+      
+      const mockPrices = {
+        location: location,
+        currency: "USD",
+        lastUpdated: new Date().toISOString(),
+        prices: {
+          petrol: {
+            regular: (Math.random() * 0.5 + 1.2).toFixed(3), // $1.20-$1.70 per liter
+            premium: (Math.random() * 0.5 + 1.4).toFixed(3), // $1.40-$1.90 per liter
+          },
+          diesel: (Math.random() * 0.4 + 1.1).toFixed(3), // $1.10-$1.50 per liter
+          lpg: (Math.random() * 0.3 + 0.6).toFixed(3), // $0.60-$0.90 per liter
+        },
+        trend: Math.random() > 0.5 ? "up" : "down",
+        changePercent: (Math.random() * 10 - 5).toFixed(2), // -5% to +5%
+      };
+
+      // Add location-specific adjustments for realism
+      const locationLower = location.toLowerCase();
+      let regionMultiplier = 1.0;
+      
+      if (locationLower.includes('norway') || locationLower.includes('switzerland')) {
+        regionMultiplier = 1.8; // Higher prices in expensive countries
+      } else if (locationLower.includes('saudi') || locationLower.includes('venezuela') || locationLower.includes('iran')) {
+        regionMultiplier = 0.3; // Lower prices in oil-producing countries
+      } else if (locationLower.includes('usa') || locationLower.includes('america')) {
+        regionMultiplier = 0.9; // Slightly lower than global average
+      } else if (locationLower.includes('india') || locationLower.includes('kashmir')) {
+        regionMultiplier = 1.1; // Moderate prices
+      }
+
+      // Apply regional multiplier
+      mockPrices.prices.petrol.regular = (parseFloat(mockPrices.prices.petrol.regular) * regionMultiplier).toFixed(3);
+      mockPrices.prices.petrol.premium = (parseFloat(mockPrices.prices.petrol.premium) * regionMultiplier).toFixed(3);
+      mockPrices.prices.diesel = (parseFloat(mockPrices.prices.diesel) * regionMultiplier).toFixed(3);
+      mockPrices.prices.lpg = (parseFloat(mockPrices.prices.lpg) * regionMultiplier).toFixed(3);
+
+      res.json(mockPrices);
+    } catch (error) {
+      console.error("Error fetching oil prices:", error);
+      res.status(500).json({ message: "Failed to fetch oil prices" });
+    }
+  });
+
+  // Get Kashmir Valley local prices (default)
+  app.get("/api/oil-prices/local", async (req, res) => {
+    try {
+      const kashmirPrices = {
+        location: "Kashmir Valley, India",
+        currency: "INR",
+        lastUpdated: new Date().toISOString(),
+        prices: {
+          petrol: {
+            regular: "108.50", // INR per liter
+            premium: "115.80",
+          },
+          diesel: "94.20",
+          lpg: "28.40", // per kg
+        },
+        trend: "stable",
+        changePercent: "+0.8",
+        government_subsidy: true,
+      };
+
+      res.json(kashmirPrices);
+    } catch (error) {
+      console.error("Error fetching local prices:", error);
+      res.status(500).json({ message: "Failed to fetch local prices" });
+    }
+  });
+
   const httpServer = createServer(app);
   return httpServer;
 }

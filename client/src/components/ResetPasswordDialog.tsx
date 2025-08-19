@@ -1,16 +1,14 @@
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
-import { motion } from "framer-motion";
-import { Shield, Copy, RefreshCw } from "lucide-react";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
+import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { 
+  Dialog, 
+  DialogContent, 
+  DialogHeader, 
+  DialogTitle 
 } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { RotateCcw, AlertTriangle, CheckCircle } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
 
 interface ResetPasswordDialogProps {
@@ -26,142 +24,127 @@ export default function ResetPasswordDialog({
   dealerId,
   dealerName,
 }: ResetPasswordDialogProps) {
-  const [newPassword, setNewPassword] = useState<string | null>(null);
+  const [newPassword, setNewPassword] = useState("");
   const { toast } = useToast();
+  const queryClient = useQueryClient();
 
-  const resetPasswordMutation = useMutation({
+  const resetMutation = useMutation({
     mutationFn: async () => {
-      const response = await fetch("/api/admin/reset-dealer-password", {
+      const response = await fetch(`/api/admin/reset-dealer-password`, {
         method: "POST",
-        headers: { 
-          "Content-Type": "application/json",
-          "x-admin-auth": sessionStorage.getItem("adminAuth") || "",
-        },
+        headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ dealerId }),
       });
-      
       if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Failed to reset password");
+        throw new Error("Failed to reset password");
       }
-      
-      return response.json();
+      return await response.json();
     },
-    onSuccess: (data: any) => {
+    onSuccess: (data) => {
       setNewPassword(data.newPassword);
+      queryClient.invalidateQueries({ queryKey: ["/api/admin/dealer-profiles"] });
       toast({
-        title: "Success",
-        description: "Password reset successfully",
+        title: "Password Reset Successfully",
+        description: "New temporary password has been generated",
       });
     },
-    onError: (error: Error) => {
+    onError: (error) => {
       toast({
-        title: "Error",
+        title: "Reset Failed",
         description: error.message || "Failed to reset password",
         variant: "destructive",
       });
     },
   });
 
-  const copyToClipboard = (text: string) => {
-    navigator.clipboard.writeText(text);
-    toast({
-      title: "Copied",
-      description: "New password copied to clipboard",
-    });
+  const handleReset = () => {
+    resetMutation.mutate();
   };
 
   const handleClose = () => {
-    setNewPassword(null);
+    setNewPassword("");
     onClose();
   };
 
   return (
     <Dialog open={open} onOpenChange={handleClose}>
-      <DialogContent className="max-w-md">
+      <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Reset Dealer Password</DialogTitle>
-          <DialogDescription>
-            Generate a new temporary password for {dealerName}
-          </DialogDescription>
+          <DialogTitle className="flex items-center gap-2">
+            <RotateCcw className="w-5 h-5" />
+            Reset Password
+          </DialogTitle>
         </DialogHeader>
 
-        {!newPassword ? (
-          <div className="space-y-4">
-            <Alert className="bg-amber-50 border-amber-200">
-              <Shield className="h-4 w-4 text-amber-600" />
-              <AlertDescription>
-                This will generate a new temporary password that the dealer must change on first login.
-              </AlertDescription>
-            </Alert>
-
-            <div className="flex justify-end space-x-2">
-              <Button variant="outline" onClick={handleClose}>
-                Cancel
-              </Button>
-              <Button
-                onClick={() => resetPasswordMutation.mutate()}
-                disabled={resetPasswordMutation.isPending}
-                className="bg-accent hover:bg-accent/90"
-              >
-                {resetPasswordMutation.isPending ? (
-                  <>
-                    <RefreshCw className="w-4 h-4 mr-2 animate-spin" />
-                    Generating...
-                  </>
-                ) : (
-                  "Generate New Password"
-                )}
-              </Button>
-            </div>
+        <div className="space-y-4">
+          <div className="text-sm text-slate-600">
+            <p>Reset password for dealer:</p>
+            <p className="font-medium text-slate-900">{dealerName}</p>
           </div>
-        ) : (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="space-y-4"
-          >
-            <Alert className="bg-green-50 border-green-200">
-              <Shield className="h-4 w-4 text-green-600" />
-              <AlertDescription>
-                New temporary password generated successfully!
-              </AlertDescription>
-            </Alert>
 
-            <div className="bg-slate-50 p-4 rounded-lg">
-              <div className="flex justify-between items-center">
-                <div>
-                  <h4 className="font-semibold text-sm mb-1">New Password:</h4>
-                  <p className="font-mono text-lg bg-white px-3 py-2 rounded border">
-                    {newPassword}
-                  </p>
-                </div>
+          {!newPassword ? (
+            <>
+              <Alert>
+                <AlertTriangle className="h-4 w-4" />
+                <AlertDescription>
+                  This will generate a new temporary password for the dealer. The dealer will be required to change it on their next login.
+                </AlertDescription>
+              </Alert>
+
+              <div className="flex flex-col sm:flex-row gap-3">
                 <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => copyToClipboard(newPassword)}
-                  className="ml-2"
+                  onClick={handleReset}
+                  disabled={resetMutation.isPending}
+                  className="flex-1"
                 >
-                  <Copy className="w-4 h-4" />
+                  {resetMutation.isPending ? (
+                    <>
+                      <div className="animate-spin w-4 h-4 border-2 border-white/30 border-t-white rounded-full mr-2"></div>
+                      Resetting...
+                    </>
+                  ) : (
+                    <>
+                      <RotateCcw className="w-4 h-4 mr-2" />
+                      Reset Password
+                    </>
+                  )}
+                </Button>
+                <Button
+                  variant="outline"
+                  onClick={handleClose}
+                  disabled={resetMutation.isPending}
+                >
+                  Cancel
                 </Button>
               </div>
-            </div>
+            </>
+          ) : (
+            <>
+              <Alert className="border-green-200 bg-green-50">
+                <CheckCircle className="h-4 w-4 text-green-600" />
+                <AlertDescription className="text-green-800">
+                  Password has been reset successfully!
+                </AlertDescription>
+              </Alert>
 
-            <Alert className="bg-blue-50 border-blue-200">
-              <Shield className="h-4 w-4 text-blue-600" />
-              <AlertDescription>
-                <strong>Important:</strong> Share this password securely with the dealer. 
-                They will be required to change it on their next login.
-              </AlertDescription>
-            </Alert>
+              <div className="bg-slate-50 p-4 rounded-lg">
+                <label className="text-sm font-medium text-slate-700 block mb-2">
+                  New Temporary Password:
+                </label>
+                <div className="bg-white border border-slate-200 rounded px-3 py-2 font-mono text-sm">
+                  {newPassword}
+                </div>
+                <p className="text-xs text-slate-500 mt-2">
+                  Share this password securely with the dealer. They must change it on their next login.
+                </p>
+              </div>
 
-            <div className="flex justify-end">
-              <Button onClick={handleClose}>
+              <Button onClick={handleClose} className="w-full">
                 Done
               </Button>
-            </div>
-          </motion.div>
-        )}
+            </>
+          )}
+        </div>
       </DialogContent>
     </Dialog>
   );

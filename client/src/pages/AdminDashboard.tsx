@@ -29,6 +29,7 @@ import AddDealerForm from "../components/Forms/AddDealerForm";
 import AdminLogin from "../components/AdminLogin";
 import CreateDealerProfile from "../components/CreateDealerProfile";
 import ResetPasswordDialog from "../components/ResetPasswordDialog";
+import ComplianceTracker from "../components/ComplianceTracker";
 
 const sidebarItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
@@ -36,6 +37,7 @@ const sidebarItems = [
   { id: "employees", label: "Employees", icon: Users },
   { id: "clients", label: "Clients", icon: Building },
   { id: "transfers", label: "Transfers", icon: ArrowRightLeft },
+  { id: "compliance", label: "Compliance", icon: Shield },
   { id: "audit", label: "Audit Logs", icon: FileText },
 ];
 
@@ -421,6 +423,17 @@ export default function AdminDashboard() {
                 </CardContent>
               </Card>
             )}
+          </motion.div>
+        )}
+
+        {activeSection === "compliance" && (
+          <motion.div 
+            className="p-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <ComplianceTracker isAdmin={true} />
           </motion.div>
         )}
 

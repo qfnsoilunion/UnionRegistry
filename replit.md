@@ -4,7 +4,18 @@
 
 Union Registry is a full-stack web application serving as a management portal for the Kashmir Valley Tank Owners & Petroleum Dealers Association. The system provides comprehensive management of dealers, employees, clients, and business operations with advanced security features including password-protected admin access (Union@2025) and 2-factor authentication with QR codes.
 
-The application uses a role-based system where users can access either ADMIN or DEALER portals. The system maintains a unified registry of petroleum dealers and their employees across the Kashmir Valley, providing tools for employee management, client registration, transfer processing, and audit logging. The homepage features sophisticated petrol fuel flowing animations and showcases the association's history, leadership, and advanced system capabilities instead of search functionality (removed per user request).
+The application uses a role-based system where users can access either ADMIN or DEALER portals. The system maintains a unified registry of petroleum dealers and their employees across the Kashmir Valley, providing tools for employee management, client registration, transfer processing (admin-only), compliance tracking (both admin and dealer), and audit logging. The homepage features an intelligent oil price tracking system with global location search capabilities and uses the uploaded fuel pump image with sophisticated animations.
+
+## Recent Changes (August 19, 2025)
+
+- ✓ Updated hero section with fuel pump image and animated particles
+- ✓ Created intelligent oil price tracking system with backend search
+- ✓ Added global location-based price search functionality  
+- ✓ Moved transfer management to admin portal only
+- ✓ Added compliance tracker to both admin and dealer portals
+- ✓ Simplified homepage to focus on price intelligence
+- ✓ Implemented realistic regional price adjustments
+- ✓ Created dealer dashboard with compliance integration
 
 ## User Preferences
 

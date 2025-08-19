@@ -19,7 +19,8 @@ import { api, type HomeMetrics } from "../lib/api";
 import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
 import Timeline from "../components/Timeline";
-import SystemCapabilities from "../components/SystemCapabilities";
+import OilPriceTracker from "../components/OilPriceTracker";
+import heroImage from "@assets/engin-akyurt-ATiv-MR0d4U-unsplash_1755583889932.jpg";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 
@@ -46,15 +47,66 @@ export default function Home() {
   return (
     <div className="min-h-screen">
       {/* Hero Section */}
-      <section className="relative bg-gradient-to-br from-primary to-blue-900 text-white overflow-hidden">
-        <OilCanvas />
-        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-24 lg:py-32">
+      <section className="relative bg-gradient-to-br from-primary to-blue-900 text-white overflow-hidden min-h-screen">
+        {/* Background Image with Overlay */}
+        <div 
+          className="absolute inset-0 bg-cover bg-center bg-no-repeat"
+          style={{ backgroundImage: `url(${heroImage})` }}
+        >
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/90 to-blue-900/90"></div>
+        </div>
+        
+        {/* Animated Fuel Particles */}
+        <div className="absolute inset-0 overflow-hidden">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-secondary rounded-full opacity-70"
+              initial={{ 
+                x: Math.random() * window.innerWidth, 
+                y: window.innerHeight + 20,
+                scale: 0 
+              }}
+              animate={{ 
+                y: -20, 
+                scale: [0, 1, 0],
+                x: Math.random() * window.innerWidth 
+              }}
+              transition={{
+                duration: Math.random() * 3 + 4,
+                repeat: Infinity,
+                delay: Math.random() * 2,
+                ease: "linear"
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Floating Fuel Drop Animation */}
+        <motion.div
+          className="absolute top-1/4 right-1/4 w-16 h-20 opacity-20"
+          animate={{
+            y: [0, -20, 0],
+            rotate: [0, 5, -5, 0]
+          }}
+          transition={{
+            duration: 4,
+            repeat: Infinity,
+            ease: "easeInOut"
+          }}
+        >
+          <div className="w-full h-full bg-secondary rounded-full relative">
+            <div className="absolute top-0 left-1/2 transform -translate-x-1/2 -translate-y-2 w-4 h-4 bg-secondary rounded-full"></div>
+          </div>
+        </motion.div>
+
+        <div className="relative z-10 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
           <motion.div 
-            className="text-center"
+            className="text-center mb-16"
             {...fadeInUp}
           >
             <motion.h1 
-              className="text-4xl lg:text-6xl font-bold mb-4"
+              className="text-4xl lg:text-6xl font-bold mb-6"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={{ opacity: 1, scale: 1 }}
               transition={{ duration: 0.8 }}
@@ -63,7 +115,7 @@ export default function Home() {
               <span className="text-secondary">Petroleum Dealers Association</span>
             </motion.h1>
             <motion.p 
-              className="text-xl lg:text-2xl mb-6 text-blue-100"
+              className="text-xl lg:text-2xl mb-4 text-blue-100"
               {...fadeInUp}
               transition={{ delay: 0.2 }}
             >
@@ -102,6 +154,16 @@ export default function Home() {
         </div>
       </section>
 
+      {/* Oil Price Intelligence Section - Main Feature */}
+      <section className="py-16 bg-slate-50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <OilPriceTracker />
+        </div>
+      </section>
+
+      {/* Stats Strip */}
+      <StatsStrip metrics={metrics} />
+
       {/* Mission Section */}
       <motion.section 
         className="py-16 bg-white"
@@ -129,11 +191,6 @@ export default function Home() {
         </div>
       </motion.section>
 
-      {/* Stats Strip */}
-      <StatsStrip metrics={metrics} />
-
-      {/* System Capabilities Showcase */}
-      <SystemCapabilities />
 
       {/* How It Works */}
       <motion.section 
@@ -316,19 +373,15 @@ export default function Home() {
               <div>
                 <h4 className="font-semibold mb-2">Founding Members:</h4>
                 <ul className="space-y-1">
-                  <li>• Haji Abdul Ahad Pandit</li>
-                  <li>• Haji Mushtaq Ahmad Rafiquee</li>
-                  <li>• Late Nazir Ahmed Bhat</li>
-                  <li>• Roshan Lal</li>
+                  <li>• Late Haji Ghulam Mohi-ud-din Rafiquee</li>
+                  <li>• Mohammed Shafi Khanday</li>
+                  <li>• Abdul Ahad Pandit</li>
+                  <li>• Mushtaq Ahmed Rafiquee</li>
                 </ul>
               </div>
               <div>
-                <br />
-                <ul className="space-y-1">
-                  <li>• Haji Manzoor Ahmed Rafiquee</li>
-                  <li>• Ayub Mustafa Bachha</li>
-                  <li>• Haji Iftikhar Hassan Pandit</li>
-                </ul>
+                <h4 className="font-semibold mb-2">Established:</h4>
+                <p>1995 - Kashmir Valley</p>
               </div>
             </div>
           </motion.div>
