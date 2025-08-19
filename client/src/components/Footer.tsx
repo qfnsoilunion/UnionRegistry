@@ -59,12 +59,12 @@ export default function Footer() {
             <p className="text-slate-400 text-sm">
               &copy; 2025 Kashmir Valley Tank Owners & Petroleum Dealers Association. All rights reserved.
             </p>
-            <div className="flex items-center justify-center gap-2 text-slate-400 text-sm">
+            <div className="flex items-center justify-center gap-1 text-slate-400 text-sm">
               <span>Designed by</span>
               <img 
                 src={quantaFonsLogo} 
                 alt="QuantaFONS Logo" 
-                className="h-5 w-auto filter brightness-0 invert"
+                className="h-4 w-auto filter brightness-0 invert mx-1"
               />
               <span className="font-bold">QuantaFONS</span>
             </div>
