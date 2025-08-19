@@ -1,4 +1,5 @@
 import { Fuel, Mail, Phone, MapPin } from "lucide-react";
+import quantaFonsLogo from "@assets/qwe-removebg-preview_1755624489426.png";
 
 export default function Footer() {
   return (
@@ -54,6 +55,18 @@ export default function Footer() {
         </div>
 
         <div className="border-t border-slate-800 mt-8 pt-8 text-center">
+          <p className="text-slate-400 text-sm mb-4">
+            &copy; 2025 Kashmir Valley Tank Owners & Petroleum Dealers Association. All rights reserved.
+          </p>
+          <p className="text-slate-400 text-sm flex items-center justify-center gap-2">
+            Designed by
+            <img 
+              src={quantaFonsLogo} 
+              alt="QuantaFONS Logo" 
+              className="h-4 w-4 filter brightness-0 invert"
+            />
+            <span className="font-bold">QuantaFONS</span>
+          </p>
         </div>
       </div>
     </footer>
