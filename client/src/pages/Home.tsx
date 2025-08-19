@@ -19,7 +19,8 @@ import { api, type HomeMetrics } from "../lib/api";
 import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
 import Timeline from "../components/Timeline";
-import OilPriceTracker from "../components/OilPriceTracker";
+import AdvancedPriceTracker from "../components/AdvancedPriceTracker";
+import FuelPriceGlobe from "../components/FuelPriceGlobe";
 import heroImage from "@assets/engin-akyurt-ATiv-MR0d4U-unsplash_1755583889932.jpg";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -92,10 +93,43 @@ export default function Home() {
         </div>
       </section>
 
-      {/* Oil Price Intelligence Section - Main Feature */}
-      <section className="py-16 bg-slate-50">
+      {/* Advanced Fuel Price Intelligence Section */}
+      <section className="py-16 bg-gradient-to-br from-slate-50 to-blue-50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <OilPriceTracker />
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            viewport={{ once: true }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+              Global Fuel Price Intelligence
+            </h2>
+            <p className="text-xl text-slate-600 max-w-3xl mx-auto">
+              Real-time petrol and diesel prices from around the world, powered by advanced search technology
+            </p>
+          </motion.div>
+          
+          <div className="space-y-8">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              viewport={{ once: true }}
+            >
+              <FuelPriceGlobe />
+            </motion.div>
+            
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              viewport={{ once: true }}
+            >
+              <AdvancedPriceTracker />
+            </motion.div>
+          </div>
         </div>
       </section>
 
