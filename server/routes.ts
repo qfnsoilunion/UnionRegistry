@@ -299,7 +299,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Validation error", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to create employee" });
+        console.error("Employee creation error:", error);
+        res.status(500).json({ message: "Failed to create employee", error: error instanceof Error ? error.message : String(error) });
       }
     }
   });
@@ -447,7 +448,8 @@ export async function registerRoutes(app: Express): Promise<Server> {
       if (error instanceof z.ZodError) {
         res.status(400).json({ message: "Validation error", errors: error.errors });
       } else {
-        res.status(500).json({ message: "Failed to create client" });
+        console.error("Client creation error:", error);
+        res.status(500).json({ message: "Failed to create client", error: error instanceof Error ? error.message : String(error) });
       }
     }
   });

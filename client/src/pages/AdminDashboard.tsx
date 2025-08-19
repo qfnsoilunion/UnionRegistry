@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { roleManager } from "@/lib/role";
 import {
   LayoutDashboard,
   Store,
@@ -53,6 +54,11 @@ export default function AdminDashboard() {
   const [showResetPassword, setShowResetPassword] = useState(false);
   const [selectedDealerForReset, setSelectedDealerForReset] = useState<{ id: string; name: string } | null>(null);
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Set the role to ADMIN when this component loads
+  useEffect(() => {
+    roleManager.set("ADMIN");
+  }, []);
 
   const { data: metrics } = useQuery<HomeMetrics>({
     queryKey: ["/api/metrics/home"],

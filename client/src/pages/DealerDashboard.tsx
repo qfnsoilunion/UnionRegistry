@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { motion } from "framer-motion";
 import { useQuery } from "@tanstack/react-query";
+import { roleManager } from "@/lib/role";
 import {
   LayoutDashboard,
   Users,
@@ -32,6 +33,11 @@ export default function DealerDashboard() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [dealerId, setDealerId] = useState<string>("");
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  
+  // Set the role to DEALER when this component loads
+  useEffect(() => {
+    roleManager.set("DEALER");
+  }, []);
 
   const { data: metrics } = useQuery<HomeMetrics>({
     queryKey: ["/api/metrics/home"],
