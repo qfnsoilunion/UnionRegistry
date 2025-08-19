@@ -65,7 +65,7 @@ export default function Footer() {
                 src={quantaFonsLogo} 
                 alt="QuantaFONS Logo" 
                 className="h-4 w-auto filter brightness-0 invert mx-1"
-                style={{ height: '1.5em' }}
+                style={{ height: '1.7em' }}
               />
               <span className="font-bold">QuantaFONS</span>
             </div>
