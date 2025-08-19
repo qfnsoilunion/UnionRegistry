@@ -692,11 +692,12 @@ export async function registerRoutes(app: Express): Promise<Server> {
 async function simulateGoogleFuelSearch(location: string) {
   const locationLower = location.toLowerCase();
   
-  // Simulate realistic regional pricing based on global data
+  // Simulate realistic regional pricing based on global data (converted to INR)
+  const USD_TO_INR = 83.12; // Current exchange rate
   let basePrice = {
-    petrol: 1.45, // USD per liter
-    diesel: 1.32,
-    premium: 1.68
+    petrol: 1.45 * USD_TO_INR, // INR per liter
+    diesel: 1.32 * USD_TO_INR,
+    premium: 1.68 * USD_TO_INR
   };
 
   // Regional adjustments based on real-world patterns
@@ -722,10 +723,10 @@ async function simulateGoogleFuelSearch(location: string) {
   // Apply regional adjustments
   const adjustedPrices = {
     petrol: {
-      regular: (basePrice.petrol * multiplier + (Math.random() * 0.1 - 0.05)).toFixed(3),
-      premium: (basePrice.premium * multiplier + (Math.random() * 0.1 - 0.05)).toFixed(3)
+      regular: (basePrice.petrol * multiplier + (Math.random() * 8 - 4)).toFixed(2),
+      premium: (basePrice.premium * multiplier + (Math.random() * 8 - 4)).toFixed(2)
     },
-    diesel: (basePrice.diesel * multiplier + (Math.random() * 0.08 - 0.04)).toFixed(3)
+    diesel: (basePrice.diesel * multiplier + (Math.random() * 6 - 3)).toFixed(2)
   };
 
   // Simulate price trends
@@ -735,8 +736,8 @@ async function simulateGoogleFuelSearch(location: string) {
   return {
     location: location,
     country: detectCountry(location),
-    currency: 'USD',
-    currencySymbol: '$',
+    currency: 'INR',
+    currencySymbol: '₹',
     lastUpdated: new Date().toISOString(),
     coordinates: getLocationCoordinates(location),
     prices: adjustedPrices,
@@ -769,14 +770,14 @@ async function getGlobalFuelPrices() {
     { name: 'Riyadh, Saudi Arabia', lat: 24.7136, lng: 46.6753, country: 'Saudi Arabia' }
   ];
 
-  const globalData = majorCities.map(city => {
-    const priceData = simulateGoogleFuelSearch(city.name);
+  const globalData = await Promise.all(majorCities.map(async city => {
+    const priceData = await simulateGoogleFuelSearch(city.name);
     return {
       ...city,
       ...priceData,
       coordinates: { lat: city.lat, lng: city.lng }
     };
-  });
+  }));
 
   return {
     timestamp: new Date().toISOString(),
@@ -839,13 +840,14 @@ function getLocationCoordinates(location: string): { lat: number; lng: number } 
 function generateNearbyStations(location: string) {
   const stationCount = 3 + Math.floor(Math.random() * 4);
   const stations = [];
+  const USD_TO_INR = 83.12;
   
   for (let i = 0; i < stationCount; i++) {
     stations.push({
       name: `Station ${i + 1}`,
       distance: (Math.random() * 5 + 0.5).toFixed(1) + ' km',
-      petrolPrice: (1.30 + Math.random() * 0.40).toFixed(3),
-      dieselPrice: (1.20 + Math.random() * 0.35).toFixed(3),
+      petrolPrice: ((1.30 + Math.random() * 0.40) * USD_TO_INR).toFixed(2),
+      dieselPrice: ((1.20 + Math.random() * 0.35) * USD_TO_INR).toFixed(2),
       rating: (3.5 + Math.random() * 1.5).toFixed(1)
     });
   }
@@ -856,18 +858,19 @@ function generateNearbyStations(location: string) {
 function generateHistoricalData() {
   const data = [];
   const days = 30;
-  let basePrice = 1.45;
+  const USD_TO_INR = 83.12;
+  let basePrice = 1.45 * USD_TO_INR;
   
   for (let i = days; i >= 0; i--) {
     const date = new Date();
     date.setDate(date.getDate() - i);
     
-    basePrice += (Math.random() - 0.5) * 0.05; // Small daily fluctuations
+    basePrice += (Math.random() - 0.5) * 4; // Small daily fluctuations in INR
     
     data.push({
       date: date.toISOString().split('T')[0],
-      petrol: (basePrice + Math.random() * 0.1 - 0.05).toFixed(3),
-      diesel: (basePrice * 0.91 + Math.random() * 0.08 - 0.04).toFixed(3)
+      petrol: (basePrice + Math.random() * 8 - 4).toFixed(2),
+      diesel: (basePrice * 0.91 + Math.random() * 6 - 3).toFixed(2)
     });
   }
   
@@ -875,17 +878,29 @@ function generateHistoricalData() {
 }
 
 function calculateAverage(data: any[], path: string): string {
-  const values = data.map(item => {
-    const keys = path.split('.');
-    let value = item.prices;
-    for (const key of keys) {
-      value = value[key];
-    }
-    return parseFloat(value);
-  });
-  
-  const average = values.reduce((sum, val) => sum + val, 0) / values.length;
-  return average.toFixed(3);
+  try {
+    const values = data.map(item => {
+      const keys = path.split('.');
+      let value = item.prices;
+      for (const key of keys) {
+        if (value && typeof value === 'object') {
+          value = value[key];
+        } else {
+          return 0; // Return 0 for invalid paths
+        }
+      }
+      return parseFloat(value) || 0;
+    });
+    
+    const validValues = values.filter(v => v > 0);
+    if (validValues.length === 0) return "0.00";
+    
+    const average = validValues.reduce((sum, val) => sum + val, 0) / validValues.length;
+    return average.toFixed(2);
+  } catch (error) {
+    console.error('Error calculating average:', error);
+    return "0.00";
+  }
 }
 
 export { simulateGoogleFuelSearch, getGlobalFuelPrices, getLiveFuelPrices, detectCountry, getLocationCoordinates, generateNearbyStations, generateHistoricalData, calculateAverage };

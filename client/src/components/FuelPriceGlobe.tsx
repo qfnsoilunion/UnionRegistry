@@ -66,9 +66,9 @@ export default function FuelPriceGlobe() {
   const getPriceColor = (price: string, type: 'petrol' | 'diesel') => {
     const numPrice = parseFloat(price);
     if (type === 'petrol') {
-      return numPrice > 1.5 ? 'text-red-600' : numPrice > 1.0 ? 'text-orange-600' : 'text-green-600';
+      return numPrice > 110 ? 'text-red-600' : numPrice > 100 ? 'text-orange-600' : 'text-green-600';
     } else {
-      return numPrice > 1.4 ? 'text-red-600' : numPrice > 0.9 ? 'text-orange-600' : 'text-green-600';
+      return numPrice > 95 ? 'text-red-600' : numPrice > 85 ? 'text-orange-600' : 'text-green-600';
     }
   };
 
@@ -174,13 +174,13 @@ export default function FuelPriceGlobe() {
                       <div className="flex justify-between">
                         <span className="text-sm text-slate-600">Regular:</span>
                         <span className={`font-mono font-semibold ${getPriceColor(selectedLocation.prices.petrol.regular, 'petrol')}`}>
-                          ${selectedLocation.prices.petrol.regular}
+                          ₹{selectedLocation.prices.petrol.regular}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-sm text-slate-600">Premium:</span>
                         <span className={`font-mono font-semibold ${getPriceColor(selectedLocation.prices.petrol.premium, 'petrol')}`}>
-                          ${selectedLocation.prices.petrol.premium}
+                          ₹{selectedLocation.prices.petrol.premium}
                         </span>
                       </div>
                     </div>
@@ -194,7 +194,7 @@ export default function FuelPriceGlobe() {
                     <div className="flex justify-between">
                       <span className="text-sm text-slate-600">Per Liter:</span>
                       <span className={`font-mono font-semibold ${getPriceColor(selectedLocation.prices.diesel, 'diesel')}`}>
-                        ${selectedLocation.prices.diesel}
+                        ₹{selectedLocation.prices.diesel}
                       </span>
                     </div>
                   </div>
@@ -234,13 +234,13 @@ export default function FuelPriceGlobe() {
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-green-600">
-                  ${globalData.averagePetrolPrice}
+                  ₹{globalData.averagePetrolPrice}
                 </div>
                 <div className="text-sm text-slate-600">Avg Petrol Price</div>
               </div>
               <div className="text-center">
                 <div className="text-2xl font-bold text-orange-600">
-                  ${globalData.averageDieselPrice}
+                  ₹{globalData.averageDieselPrice}
                 </div>
                 <div className="text-sm text-slate-600">Avg Diesel Price</div>
               </div>

@@ -99,8 +99,8 @@ export default function AdvancedPriceTracker() {
     }
   };
 
-  const formatCurrency = (amount: string, symbol: string = '$') => {
-    return `${symbol}${parseFloat(amount).toFixed(3)}`;
+  const formatCurrency = (amount: string, symbol: string = '₹') => {
+    return `${symbol}${parseFloat(amount).toFixed(2)}`;
   };
 
   const getTrendIcon = (trend: string) => {
