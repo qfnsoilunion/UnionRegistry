@@ -20,7 +20,7 @@ import OilCanvas from "../components/OilCanvas";
 import StatsStrip from "../components/StatsStrip";
 import Timeline from "../components/Timeline";
 import AdvancedPriceTracker from "../components/AdvancedPriceTracker";
-import FuelPriceGlobe from "../components/FuelPriceGlobe";
+import FuelStationsMapFree from "../components/FuelStationsMapFree";
 import heroImage from "@assets/engin-akyurt-ATiv-MR0d4U-unsplash_1755583889932.jpg";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
@@ -104,10 +104,10 @@ export default function Home() {
             className="text-center mb-12"
           >
             <h2 className="text-4xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-              Global Fuel Price Intelligence
+              Live Fuel Station Map & Prices
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Real-time petrol and diesel prices from around the world, powered by advanced search technology
+              Find nearby petrol pumps with real-time petrol and diesel prices, powered by OpenStreetMap - completely free, no API key needed!
             </p>
           </motion.div>
           
@@ -118,7 +118,7 @@ export default function Home() {
               transition={{ duration: 0.8, delay: 0.2 }}
               viewport={{ once: true }}
             >
-              <FuelPriceGlobe />
+              <FuelStationsMapFree />
             </motion.div>
             
             <motion.div

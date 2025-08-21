@@ -6,19 +6,18 @@ Union Registry is a full-stack web application serving as a management portal fo
 
 The application uses a role-based system where users can access either ADMIN or DEALER portals. The system maintains a unified registry of petroleum dealers and their employees across the Kashmir Valley, providing tools for employee management, client registration, transfer processing (admin-only), compliance tracking (both admin and dealer), and audit logging. The homepage features an intelligent oil price tracking system with global location search capabilities and uses the uploaded fuel pump image with sophisticated animations.
 
-## Recent Changes (August 19, 2025)
+## Recent Changes (August 21, 2025)
 
-- ✓ Created advanced fuel price intelligence system with Google search simulation
-- ✓ Implemented interactive global fuel price map/globe with rotating visualization
-- ✓ Added sophisticated price tracking with real-time petrol and diesel prices
-- ✓ Built comprehensive analytics dashboard with market analysis and volatility tracking
-- ✓ Added nearby fuel stations finder with pricing comparisons
-- ✓ Implemented 30-day historical price charts with trend analysis
-- ✓ Created auto-refresh functionality for live price updates
-- ✓ Replaced basic oil price section with advanced multi-component system
-- ✓ Completed comprehensive management system for dealer/admin portals
-- ✓ Added global search functionality across employees and clients
-- ✓ Implemented complete audit logging system
+- ✓ Replaced Google Maps with OpenStreetMap/Leaflet for fuel station map (completely free, no API key needed)
+- ✓ Integrated Overpass API to find real fuel stations from OpenStreetMap data
+- ✓ Added free geocoding with Nominatim for location search
+- ✓ Shows nearby petrol pumps within 5km radius with simulated real-time prices
+- ✓ Displays fuel station amenities like shop, car wash, restrooms from OSM data
+- ✓ User location detection with distance calculations to each station
+- ✓ Interactive map with station markers and detailed popup information
+- ✓ Fixed role management for Admin/Dealer panels ensuring proper API authentication
+- ✓ Resolved employee and client creation issues with x-actor header requirement
+- ✓ Comprehensive testing of all CRUD operations across both panels
 
 ## User Preferences
 
