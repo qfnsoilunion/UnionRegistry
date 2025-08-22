@@ -41,6 +41,7 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
   next();
 }
 
+
 export async function registerRoutes(app: Express): Promise<Server> {
   // Initialize admin account on startup
   await initializeAdmin();
@@ -183,10 +184,23 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Home metrics
+  // Cache for metrics to improve performance
+  let metricsCache: any = null;
+  let lastMetricsFetch = 0;
+  const METRICS_CACHE_TTL = 30000; // 30 seconds
+
+  // Home metrics with caching
   app.get("/api/metrics/home", async (req, res) => {
     try {
+      const now = Date.now();
+      if (metricsCache && (now - lastMetricsFetch) < METRICS_CACHE_TTL) {
+        return res.json(metricsCache);
+      }
+
       const metrics = await storage.getHomeMetrics();
+      metricsCache = metrics;
+      lastMetricsFetch = now;
+      
       res.json(metrics);
     } catch (error) {
       res.status(500).json({ message: "Failed to fetch metrics" });
@@ -610,6 +624,10 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
+  // Cache for oil prices to reduce redundant calculations
+  const priceCache = new Map();
+  const PRICE_CACHE_TTL = 60000; // 1 minute
+
   // Advanced oil price search with Google integration
   app.get("/api/oil-prices/search", async (req, res) => {
     try {
@@ -621,8 +639,21 @@ export async function registerRoutes(app: Express): Promise<Server> {
 
       console.log(`Searching fuel prices for: ${location}`);
       
+      // Check cache first
+      const cacheKey = location.toLowerCase();
+      const cached = priceCache.get(cacheKey);
+      if (cached && (Date.now() - cached.timestamp) < PRICE_CACHE_TTL) {
+        return res.json(cached.data);
+      }
+      
       // Simulate Google search results for fuel prices
       const searchResults = await simulateGoogleFuelSearch(location);
+      
+      // Cache the results
+      priceCache.set(cacheKey, {
+        data: searchResults,
+        timestamp: Date.now()
+      });
       
       res.json(searchResults);
     } catch (error) {
@@ -631,10 +662,22 @@ export async function registerRoutes(app: Express): Promise<Server> {
     }
   });
 
-  // Global fuel prices map data
+  // Global fuel prices map data with caching
+  let globalPricesCache: any = null;
+  let lastGlobalFetch = 0;
+  const GLOBAL_PRICE_CACHE_TTL = 300000; // 5 minutes
+
   app.get("/api/oil-prices/global", async (req, res) => {
     try {
+      const now = Date.now();
+      if (globalPricesCache && (now - lastGlobalFetch) < GLOBAL_PRICE_CACHE_TTL) {
+        return res.json(globalPricesCache);
+      }
+
       const globalPrices = await getGlobalFuelPrices();
+      globalPricesCache = globalPrices;
+      lastGlobalFetch = now;
+      
       res.json(globalPrices);
     } catch (error) {
       console.error('Global fuel prices error:', error);
@@ -1031,4 +1074,4 @@ function calculateAverage(data: any[], path: string): string {
   }
 }
 
-export { simulateGoogleFuelSearch, getGlobalFuelPrices, getLiveFuelPrices, detectCountry, getLocationCoordinates, generateNearbyStations, generateHistoricalData, calculateAverage };
+export { simulateGoogleFuelSearch, getGlobalFuelPrices, getLiveFuelPrices };
