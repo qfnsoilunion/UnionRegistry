@@ -252,7 +252,7 @@ export default function FuelStationsMapFree() {
   };
 
   return (
-    <div className="w-full space-y-4">
+    <div className="w-full space-y-4 px-4 md:px-8 lg:px-16">
       {/* Search Bar */}
       <Card className="p-4">
         <div className="flex gap-2">
