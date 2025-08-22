@@ -138,6 +138,7 @@ export default function Home() {
 
       {/* Mission Section */}
       <motion.section 
+        id="about"
         className="py-16 bg-white"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -166,6 +167,7 @@ export default function Home() {
 
       {/* How It Works */}
       <motion.section 
+        id="services"
         className="py-16 bg-slate-100"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
@@ -230,6 +232,7 @@ export default function Home() {
 
       {/* Leadership */}
       <motion.section 
+        id="leadership"
         className="py-16 bg-slate-100"
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
