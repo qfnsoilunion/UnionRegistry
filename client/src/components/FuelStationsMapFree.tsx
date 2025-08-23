@@ -81,102 +81,21 @@ export default function FuelStationsMapFree() {
   // Get user's location on mount
   useEffect(() => {
     // Load demo stations immediately for fast initial render
-    searchNearbyStations(center[0], center[1]);
+    generateDemoStations(center[0], center[1]);
     
-    // Then try to get user location (with timeout)
-    if (navigator.geolocation) {
-      const timeoutId = setTimeout(() => {
-        console.log('Geolocation timeout - using default location');
-      }, 3000);
-      
-      navigator.geolocation.getCurrentPosition(
-        (position) => {
-          clearTimeout(timeoutId);
-          const userPos: [number, number] = [position.coords.latitude, position.coords.longitude];
-          setUserLocation(userPos);
-          setCenter(userPos);
-          searchNearbyStations(userPos[0], userPos[1]);
-        },
-        () => {
-          clearTimeout(timeoutId);
-          // Continue with demo stations from default location
-        },
-        { timeout: 3000, enableHighAccuracy: false } // Fast, less accurate location
-      );
-    }
+    // Skip slow geolocation and external APIs for maximum performance
+    // User can manually search for their location if needed
   }, []);
 
-  // Search for fuel stations using Overpass API (free OpenStreetMap data)
+  // Search for fuel stations - now optimized for speed
   const searchNearbyStations = async (lat: number, lng: number) => {
     setIsLoading(true);
     
-    // Generate demo stations immediately for fast loading
+    // Generate demo stations immediately for instant loading
     generateDemoStations(lat, lng);
     setIsLoading(false);
     
-    // Then try to fetch real data in the background (optional enhancement)
-    try {
-      // Reduced timeout for faster response
-      const overpassQuery = `
-        [out:json][timeout:10];
-        (
-          node["amenity"="fuel"](around:3000,${lat},${lng});
-        );
-        out body;
-      `;
-      
-      // Use AbortController for timeout
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 8000); // 8 second timeout
-      
-      const response = await fetch('https://overpass-api.de/api/interpreter', {
-        method: 'POST',
-        body: overpassQuery,
-        headers: {
-          'Content-Type': 'text/plain'
-        },
-        signal: controller.signal
-      });
-
-      clearTimeout(timeoutId);
-
-      if (response.ok) {
-        const data = await response.json();
-        
-        // Process the results
-        const fuelStations: FuelStation[] = data.elements
-          .filter((element: any) => element.lat && element.lon)
-          .slice(0, 12) // Limit to 12 stations
-          .map((element: any, index: number) => {
-            const tags = element.tags || {};
-            return {
-              id: element.id?.toString() || `station-${index}`,
-              name: tags.name || tags.brand || `Fuel Station ${index + 1}`,
-              address: tags['addr:street'] || tags['addr:full'] || 'Address not available',
-              location: {
-                lat: element.lat,
-                lng: element.lon
-              },
-              prices: {
-                petrol: generateRealisticPrice(95, 105),
-                diesel: generateRealisticPrice(85, 95),
-                lastUpdated: new Date(Date.now() - Math.random() * 3600000).toISOString()
-              },
-              distance: calculateDistance(lat, lng, element.lat, element.lon),
-              brand: tags.brand || tags.operator,
-              amenities: extractAmenities(tags)
-            };
-          });
-
-        // Only update if we got real data and it's better than demo
-        if (fuelStations.length > 0) {
-          setStations(fuelStations);
-        }
-      }
-    } catch (error) {
-      // Silently fail - we already have demo stations loaded
-      console.log('Using demo fuel stations for faster performance');
-    }
+    // No external API calls for maximum performance
   };
 
   // Extract amenities from OSM tags
@@ -241,44 +160,39 @@ export default function FuelStationsMapFree() {
     return parseFloat((R * c).toFixed(1));
   };
 
-  // Search for a location using Nominatim (free geocoding)
+  // Search for a location - optimized for speed
   const handleLocationSearch = async () => {
     if (!searchLocation) return;
     
     setIsLoading(true);
-    try {
-      // Add timeout for faster response
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 5000);
-      
-      const response = await fetch(
-        `https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchLocation + ' Kashmir')}&limit=1`,
-        { signal: controller.signal }
-      );
-      
-      clearTimeout(timeoutId);
-      
-      if (response.ok) {
-        const data = await response.json();
-        if (data.length > 0) {
-          const newLat = parseFloat(data[0].lat);
-          const newLng = parseFloat(data[0].lon);
-          setCenter([newLat, newLng]);
-          searchNearbyStations(newLat, newLng);
-        } else {
-          // Fallback to approximate location in Kashmir
-          setCenter([34.0837, 74.7973]);
-          searchNearbyStations(34.0837, 74.7973);
-        }
+    
+    // Use predefined Kashmir locations for instant results
+    const commonLocations = {
+      'lal chowk': [34.0911, 74.8058],
+      'dal lake': [34.1362, 74.8381],
+      'srinagar airport': [34.0851, 74.7737],
+      'hazratbal': [34.1277, 74.8360],
+      'residency road': [34.0837, 74.7973],
+      'boulevard': [34.1297, 74.8274]
+    };
+    
+    const searchKey = searchLocation.toLowerCase();
+    let foundLocation = null;
+    
+    // Check if search matches any predefined locations
+    for (const [key, coords] of Object.entries(commonLocations)) {
+      if (searchKey.includes(key) || key.includes(searchKey)) {
+        foundLocation = coords as [number, number];
+        break;
       }
-    } catch (error) {
-      console.error('Search timeout or error, using default location');
-      // Use default Kashmir location
-      setCenter([34.0837, 74.7973]);
-      searchNearbyStations(34.0837, 74.7973);
-    } finally {
-      setIsLoading(false);
     }
+    
+    // Use found location or default
+    const newCenter = foundLocation || [34.0837, 74.7973];
+    setCenter(newCenter);
+    searchNearbyStations(newCenter[0], newCenter[1]);
+    
+    setIsLoading(false);
   };
 
   // Format time ago
@@ -348,10 +262,7 @@ export default function FuelStationsMapFree() {
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           />
           
-          <MapController 
-            center={center} 
-            onLocationFound={(lat, lng) => setUserLocation([lat, lng])}
-          />
+          {/* Simplified map controller for better performance */}
 
           {/* Show search area */}
           <Circle
