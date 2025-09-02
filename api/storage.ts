@@ -147,7 +147,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchPersons(query: { aadhaar?: string; name?: string; mobile?: string }): Promise<Person[]> {
-    let conditions = [];
+    let conditions: any[] = [];
     if (query.aadhaar) conditions.push(eq(persons.aadhaar, query.aadhaar));
     if (query.name) conditions.push(sql`${persons.name} ILIKE ${'%' + query.name + '%'}`);
     if (query.mobile) conditions.push(eq(persons.mobile, query.mobile));
@@ -220,7 +220,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async searchClients(query: { pan?: string; govClientId?: string; name?: string; vehicle?: string }): Promise<Client[]> {
-    let conditions = [];
+    let conditions: any[] = [];
     if (query.pan) conditions.push(eq(clients.pan, query.pan));
     if (query.govClientId) conditions.push(eq(clients.govClientId, query.govClientId));
     if (query.name) conditions.push(sql`${clients.name} ILIKE ${'%' + query.name + '%'}`);
@@ -356,7 +356,7 @@ export class DatabaseStorage implements IStorage {
   }
 
   async getAuditLogs(filters?: { entity?: string; entityId?: string }): Promise<AuditLog[]> {
-    let conditions = [];
+    let conditions: any[] = [];
     if (filters?.entity) conditions.push(eq(auditLogs.entity, filters.entity));
     if (filters?.entityId) conditions.push(eq(auditLogs.entityId, filters.entityId));
 
