@@ -1,0 +1,24 @@
+{
+  "name": "union-registry-backend",
+  "version": "1.0.0",
+  "type": "module",
+  "dependencies": {
+    "@neondatabase/serverless": "^0.10.4",
+    "@types/bcryptjs": "^2.4.6",
+    "@vercel/node": "^3.0.0",
+    "bcryptjs": "^3.0.2",
+    "drizzle-orm": "^0.39.1",
+    "drizzle-zod": "^0.7.0",
+    "qrcode": "^1.5.4",
+    "speakeasy": "^2.0.0",
+    "zod": "^3.24.2",
+    "zod-validation-error": "^3.4.0"
+  },
+  "devDependencies": {
+    "@types/node": "20.16.11",
+    "@types/qrcode": "^1.5.5",
+    "@types/speakeasy": "^2.0.10",
+    "drizzle-kit": "^0.30.4",
+    "typescript": "5.6.3"
+  }
+}
