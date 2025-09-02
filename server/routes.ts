@@ -1010,7 +1010,7 @@ function getLocationCoordinates(location: string): { lat: number; lng: number } 
 
 function generateNearbyStations(location: string) {
   const stationCount = 3 + Math.floor(Math.random() * 4);
-  const stations = [];
+  const stations: any[] = [];
   const USD_TO_INR = 83.12;
   
   for (let i = 0; i < stationCount; i++) {
@@ -1027,7 +1027,7 @@ function generateNearbyStations(location: string) {
 }
 
 function generateHistoricalData() {
-  const data = [];
+  const data: any[] = [];
   const days = 30;
   const USD_TO_INR = 83.12;
   let basePrice = 1.45 * USD_TO_INR;

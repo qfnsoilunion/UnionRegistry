@@ -11,7 +11,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
         return res.status(400).json({ message: 'Search query is required' });
       }
 
-      let results = [];
+      let results: any;
 
       switch (type) {
         case 'persons':
