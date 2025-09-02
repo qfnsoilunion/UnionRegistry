@@ -2,17 +2,37 @@
   "version": 2,
   "buildCommand": "cd client && npm install && npm run build",
   "outputDirectory": "client/dist",
-  "framework": null,
   "functions": {
-    "backend/api/**/*.ts": {
-      "runtime": "@vercel/node@3.0.0",
-      "maxDuration": 30
+    "backend/api/search/index.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/metrics/home.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/dealers/index.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/employees/index.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/clients/index.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/admin/verify-password.ts": {
+      "runtime": "@vercel/node"
+    },
+    "backend/api/admin/verify-totp.ts": {
+      "runtime": "@vercel/node"
     }
   },
-  "rewrites": [
+  "routes": [
     {
-      "source": "/api/:path*",
-      "destination": "/backend/api/:path*"
+      "src": "/api/(.*)",
+      "dest": "/backend/api/$1"
+    },
+    {
+      "src": "/(.*)",
+      "dest": "/client/dist/$1"
     }
   ]
 }
