@@ -23,7 +23,7 @@ import {
   type InsertClient,
   type InsertVehicle,
   type InsertTransferRequest,
-} from "./shared/schema";
+} from "../shared/schema";
 import { db } from "./db";
 import { eq, and, desc, sql, count } from "drizzle-orm";
 

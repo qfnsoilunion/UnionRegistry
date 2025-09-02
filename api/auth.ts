@@ -2,7 +2,7 @@ import bcrypt from "bcryptjs";
 import speakeasy from "speakeasy";
 import QRCode from "qrcode";
 import { db } from "./db";
-import { adminAuth, dealerProfiles } from "@shared/schema";
+import { adminAuth, dealerProfiles } from "../shared/schema";
 import { eq } from "drizzle-orm";
 
 const ADMIN_USERNAME = "admin";
