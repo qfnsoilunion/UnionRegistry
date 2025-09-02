@@ -21,6 +21,7 @@ import {
   changeDealerPassword,
   resetDealerPassword
 } from "./auth";
+import { initializeDatabase } from "./init-db";
 
 function getActorFromHeaders(req: any): string {
   const actor = req.headers["x-actor"];
@@ -43,6 +44,9 @@ function requireAdmin(req: Request, res: Response, next: NextFunction) {
 
 
 export async function registerRoutes(app: Express): Promise<Server> {
+  // Initialize database tables first
+  await initializeDatabase();
+  
   // Initialize admin account on startup
   await initializeAdmin();
 
