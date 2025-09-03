@@ -1,0 +1,79 @@
+[09:32:50.729] Running build in Washington, D.C., USA (East) – iad1
+[09:32:50.729] Build machine configuration: 2 cores, 8 GB
+[09:32:50.768] Cloning github.com/qfnsoilunion/UnionRegistry (Branch: main, Commit: d63d753)
+[09:32:51.069] Previous build caches not available
+[09:32:51.409] Cloning completed: 641.000ms
+[09:32:51.458] Found .vercelignore
+[09:32:51.478] Removed 159 ignored files defined in .vercelignore
+[09:32:51.479]   /.git/config
+[09:32:51.479]   /.git/description
+[09:32:51.479]   /.git/FETCH_HEAD
+[09:32:51.479]   /.git/HEAD
+[09:32:51.479]   /.git/hooks/applypatch-msg.sample
+[09:32:51.479]   /.git/hooks/commit-msg.sample
+[09:32:51.479]   /.git/hooks/fsmonitor-watchman.sample
+[09:32:51.479]   /.git/hooks/post-update.sample
+[09:32:51.479]   /.git/hooks/pre-applypatch.sample
+[09:32:51.479]   /.git/hooks/pre-commit.sample
+[09:32:51.738] Running "vercel build"
+[09:32:52.268] Vercel CLI 46.1.1
+[09:32:53.117] Running "install" command: `npm install`...
+[09:33:35.124] npm warn deprecated @esbuild-kit/esm-loader@2.6.5: Merged into tsx: https://tsx.is
+[09:33:35.168] npm warn deprecated @esbuild-kit/core-utils@3.3.2: Merged into tsx: https://tsx.is
+[09:33:43.142] 
+[09:33:43.143] added 643 packages, and audited 644 packages in 49s
+[09:33:43.143] 
+[09:33:43.144] 75 packages are looking for funding
+[09:33:43.144]   run `npm fund` for details
+[09:33:43.177] 
+[09:33:43.177] 8 vulnerabilities (6 moderate, 2 high)
+[09:33:43.178] 
+[09:33:43.178] To address all issues (including breaking changes), run:
+[09:33:43.178]   npm audit fix --force
+[09:33:43.178] 
+[09:33:43.178] Run `npm audit` for details.
+[09:33:45.023] 
+[09:33:45.023] added 3 packages, and audited 647 packages in 1s
+[09:33:45.024] 
+[09:33:45.024] 76 packages are looking for funding
+[09:33:45.024]   run `npm fund` for details
+[09:33:45.054] 
+[09:33:45.055] 8 vulnerabilities (6 moderate, 2 high)
+[09:33:45.055] 
+[09:33:45.056] To address all issues (including breaking changes), run:
+[09:33:45.056]   npm audit fix --force
+[09:33:45.056] 
+[09:33:45.056] Run `npm audit` for details.
+[09:33:56.323] 
+[09:33:56.323] added 346 packages, and audited 347 packages in 11s
+[09:33:56.323] 
+[09:33:56.323] 49 packages are looking for funding
+[09:33:56.323]   run `npm fund` for details
+[09:33:56.334] 
+[09:33:56.334] 2 moderate severity vulnerabilities
+[09:33:56.334] 
+[09:33:56.335] To address all issues (including breaking changes), run:
+[09:33:56.335]   npm audit fix --force
+[09:33:56.335] 
+[09:33:56.335] Run `npm audit` for details.
+[09:33:56.521] 
+[09:33:56.521] > union-registry-frontend@1.0.0 build
+[09:33:56.522] > vite build
+[09:33:56.522] 
+[09:33:57.072] [36mvite v5.4.19 [32mbuilding for production...[36m[39m
+[09:33:57.279] transforming...
+[09:33:57.376] [32m✓[39m 4 modules transformed.
+[09:33:57.381] [31mx[39m Build failed in 285ms
+[09:33:57.382] [31merror during build:
+[09:33:57.382] [31m[vite]: Rollup failed to resolve import "@/components/ui/toaster" from "/vercel/path0/client/src/App.tsx".
+[09:33:57.382] This is most likely unintended because it can break your application at runtime.
+[09:33:57.382] If you do want to externalize this module explicitly add it to
+[09:33:57.382] `build.rollupOptions.external`[31m
+[09:33:57.382]     at viteWarn (file:///vercel/path0/client/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65839:17)
+[09:33:57.382]     at onRollupWarning (file:///vercel/path0/client/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65871:5)
+[09:33:57.383]     at onwarn (file:///vercel/path0/client/node_modules/vite/dist/node/chunks/dep-C6uTJdX2.js:65534:7)
+[09:33:57.383]     at file:///vercel/path0/client/node_modules/rollup/dist/es/shared/node-entry.js:20920:13
+[09:33:57.383]     at Object.logger [as onLog] (file:///vercel/path0/client/node_modules/rollup/dist/es/shared/node-entry.js:22792:9)
+[09:33:57.383]     at ModuleLoader.handleInvalidResolvedId (file:///vercel/path0/client/node_modules/rollup/dist/es/shared/node-entry.js:21536:26)
+[09:33:57.383]     at file:///vercel/path0/client/node_modules/rollup/dist/es/shared/node-entry.js:21494:26[39m
+[09:33:57.397] Error: Command "npm install && cd client && npm install && npm run build" exited with 1
