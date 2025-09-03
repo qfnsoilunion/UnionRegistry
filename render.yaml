@@ -1,0 +1,13 @@
+services:
+  - type: web
+    name: union-registry
+    runtime: node
+    plan: free
+    buildCommand: npm install && cd client && npm install && npm run build && cd .. && npm run build
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: DATABASE_URL
+        sync: false
+    healthCheckPath: /api/health
