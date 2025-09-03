@@ -10,6 +10,7 @@ import {
   Menu,
   X as CloseIcon,
   LogOut,
+  Search,
 } from "lucide-react";
 
 import { api, type HomeMetrics, type Dealer } from "../lib/api";
@@ -20,11 +21,14 @@ import EmployeeManagement from "@/components/EmployeeManagement";
 import ClientManagement from "@/components/ClientManagement";
 import DealerLogin from "../components/DealerLogin";
 import ComplianceTracker from "../components/ComplianceTracker";
+import GlobalEmployeeSearch from "@/components/GlobalEmployeeSearch";
+import GlobalClientSearch from "@/components/GlobalClientSearch";
 
 const sidebarItems = [
   { id: "overview", label: "Overview", icon: LayoutDashboard },
   { id: "employees", label: "Employees", icon: Users },
   { id: "clients", label: "Clients", icon: Building },
+  { id: "search", label: "Search", icon: Search },
   { id: "compliance", label: "Compliance", icon: Shield },
 ];
 
@@ -246,17 +250,18 @@ export default function DealerDashboard() {
                   <Button
                     variant="outline"
                     className="h-auto p-4 flex flex-col items-center gap-2"
-                    onClick={() => setActiveSection("compliance")}
+                    onClick={() => setActiveSection("search")}
                   >
-                    <Shield className="w-6 h-6" />
-                    <span className="text-sm">Compliance</span>
+                    <Search className="w-6 h-6" />
+                    <span className="text-sm">Search</span>
                   </Button>
                   <Button
                     variant="outline"
                     className="h-auto p-4 flex flex-col items-center gap-2"
+                    onClick={() => setActiveSection("compliance")}
                   >
-                    <LayoutDashboard className="w-6 h-6" />
-                    <span className="text-sm">Reports</span>
+                    <Shield className="w-6 h-6" />
+                    <span className="text-sm">Compliance</span>
                   </Button>
                 </div>
               </CardContent>
@@ -283,6 +288,29 @@ export default function DealerDashboard() {
             transition={{ duration: 0.5 }}
           >
             <ClientManagement dealerId={dealerId} />
+          </motion.div>
+        )}
+
+        {activeSection === "search" && (
+          <motion.div 
+            className="p-6"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <div className="space-y-6">
+              <div>
+                <h2 className="text-2xl font-bold mb-2">Global Search</h2>
+                <p className="text-muted-foreground">
+                  Search for employees and clients across all dealers to check employment history and current assignments.
+                </p>
+              </div>
+              
+              <div className="grid gap-6 lg:grid-cols-2">
+                <GlobalEmployeeSearch />
+                <GlobalClientSearch />
+              </div>
+            </div>
           </motion.div>
         )}
 

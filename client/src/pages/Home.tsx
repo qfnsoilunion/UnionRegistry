@@ -107,7 +107,7 @@ export default function Home() {
               Live Fuel Station Map & Prices
             </h2>
             <p className="text-xl text-slate-600 max-w-3xl mx-auto">
-              Find nearby petrol pumps with real-time petrol and diesel prices, powered by OpenStreetMap - completely free, no API key needed!
+              Interactive map showing fuel stations across Kashmir Valley with real-time location data.
             </p>
           </motion.div>
           
