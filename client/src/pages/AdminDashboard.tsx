@@ -42,7 +42,6 @@ const sidebarItems = [
   { id: "clients", label: "Clients", icon: Building },
   { id: "transfers", label: "Transfers", icon: ArrowRightLeft },
   { id: "compliance", label: "Compliance", icon: Shield },
-  { id: "audit", label: "Audit Logs", icon: FileText },
 ];
 
 export default function AdminDashboard() {
@@ -430,16 +429,7 @@ export default function AdminDashboard() {
           </motion.div>
         )}
 
-        {activeSection === "audit" && (
-          <motion.div 
-            className="p-6"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <AuditLogsManagement />
-          </motion.div>
-        )}
+
       </div>
 
       {/* Modals */}

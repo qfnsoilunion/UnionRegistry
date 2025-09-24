@@ -1,3 +1,8 @@
+  async updateDealerPassword(dealerId: string, passwordHash: string, temporary: boolean): Promise<void> {
+    await db.update(dealerProfiles)
+      .set({ passwordHash, temporaryPassword: temporary, updatedAt: new Date() })
+      .where(eq(dealerProfiles.dealerId, dealerId));
+  }
 import {
   dealers,
   dealerProfiles,
@@ -92,6 +97,12 @@ export interface IStorage {
 }
 
 export class DatabaseStorage implements IStorage {
+
+  async updateDealerPassword(dealerId: string, passwordHash: string, temporary: boolean): Promise<void> {
+    await db.update(dealerProfiles)
+      .set({ passwordHash, temporaryPassword: temporary, updatedAt: new Date() })
+      .where(eq(dealerProfiles.dealerId, dealerId));
+  }
   async createDealer(dealer: InsertDealer): Promise<Dealer> {
     const [created] = await db.insert(dealers).values(dealer).returning();
     return created;
