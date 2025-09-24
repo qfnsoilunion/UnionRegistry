@@ -12,9 +12,7 @@ export default async function handler(req: VercelRequest, res: VercelResponse) {
     
     if (result.success) {
       res.json({
-        success: true,
-        totpEnabled: result.totpEnabled,
-        qrCode: result.qrCode,
+        success: true
       });
     } else {
       res.status(401).json({ message: 'Invalid password' });
