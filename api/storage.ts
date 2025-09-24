@@ -98,6 +98,17 @@ export interface IStorage {
 
 export class DatabaseStorage implements IStorage {
 
+  async updateDealerProfile(dealerId: string, updates: { username: string; email: string; mobile: string }): Promise<void> {
+    await db.update(dealerProfiles)
+      .set({
+        username: updates.username,
+        email: updates.email,
+        mobile: updates.mobile,
+        updatedAt: new Date(),
+      })
+      .where(eq(dealerProfiles.dealerId, dealerId));
+  }
+
   async updateDealerPassword(dealerId: string, passwordHash: string, temporary: boolean): Promise<void> {
     await db.update(dealerProfiles)
       .set({ passwordHash, temporaryPassword: temporary, updatedAt: new Date() })

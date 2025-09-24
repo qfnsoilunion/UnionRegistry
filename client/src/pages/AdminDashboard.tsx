@@ -323,6 +323,17 @@ export default function AdminDashboard() {
                               size="sm"
                               variant="outline"
                               onClick={() => {
+                                setSelectedDealerForProfile(row.original.id + ':edit');
+                                setShowDealerProfile(true);
+                              }}
+                            >
+                              <Shield className="w-4 h-4 mr-2" />
+                              Edit Profile
+                            </Button>
+                            <Button
+                              size="sm"
+                              variant="outline"
+                              onClick={() => {
                                 setSelectedDealerForReset({ id: row.original.id, name: row.original.legalName });
                                 setShowResetPassword(true);
                               }}
@@ -445,8 +456,9 @@ export default function AdminDashboard() {
             setShowDealerProfile(false);
             setSelectedDealerForProfile(null);
           }}
-          dealerId={selectedDealerForProfile}
-          dealerName={dealers?.find(d => d.id === selectedDealerForProfile)?.legalName || ""}
+          dealerId={selectedDealerForProfile.replace(':edit', '')}
+          dealerName={dealers?.find(d => d.id === selectedDealerForProfile.replace(':edit', ''))?.legalName || ""}
+          editMode={selectedDealerForProfile.endsWith(':edit')}
         />
       )}
 

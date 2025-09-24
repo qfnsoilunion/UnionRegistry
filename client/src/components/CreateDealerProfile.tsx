@@ -20,6 +20,7 @@ interface CreateDealerProfileProps {
   onClose: () => void;
   dealerId: string;
   dealerName: string;
+  editMode?: boolean;
 }
 
 export default function CreateDealerProfile({
@@ -27,6 +28,7 @@ export default function CreateDealerProfile({
   onClose,
   dealerId,
   dealerName,
+  editMode = false,
 }: CreateDealerProfileProps) {
   const [formData, setFormData] = useState({
     username: "",
@@ -35,6 +37,7 @@ export default function CreateDealerProfile({
     email: "",
     mobile: "",
   });
+  const [loadingProfile, setLoadingProfile] = useState(false);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [generatedPassword, setGeneratedPassword] = useState("");
   const { toast } = useToast();
@@ -101,26 +104,45 @@ export default function CreateDealerProfile({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (formData.password !== formData.confirmPassword) {
-      toast({
-        title: "Error",
-        description: "Passwords do not match",
-        variant: "destructive",
-      });
-      return;
+    if (!editMode) {
+      if (formData.password !== formData.confirmPassword) {
+        toast({
+          title: "Error",
+          description: "Passwords do not match",
+          variant: "destructive",
+        });
+        return;
+      }
+      if (formData.password.length < 8) {
+        toast({
+          title: "Error",
+          description: "Password must be at least 8 characters",
+          variant: "destructive",
+        });
+        return;
+      }
+      createProfileMutation.mutate(formData);
+    } else {
+      // Edit mode: update profile
+      fetch("/api/admin/dealer-profiles", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json", "x-admin-auth": sessionStorage.getItem("adminAuth") || "" },
+        body: JSON.stringify({
+          dealerId,
+          username: formData.username,
+          email: formData.email,
+          mobile: formData.mobile,
+        }),
+      })
+        .then(async (res) => {
+          if (!res.ok) throw new Error((await res.json()).message || "Failed to update profile");
+          toast({ title: "Profile Updated", description: "Dealer profile updated successfully" });
+          onClose();
+        })
+        .catch((err) => {
+          toast({ title: "Error", description: err.message, variant: "destructive" });
+        });
     }
-
-    if (formData.password.length < 8) {
-      toast({
-        title: "Error",
-        description: "Password must be at least 8 characters",
-        variant: "destructive",
-      });
-      return;
-    }
-
-    createProfileMutation.mutate(formData);
   };
 
   const handleClose = () => {
@@ -136,17 +158,40 @@ export default function CreateDealerProfile({
     onClose();
   };
 
+  // Load dealer profile for edit
+  useEffect(() => {
+    if (editMode && dealerId && open) {
+      setLoadingProfile(true);
+      fetch(`/api/clients/index?dealerId=${dealerId}`)
+        .then((res) => res.json())
+        .then((data) => {
+          // Assume first profile is the one to edit
+          const profile = Array.isArray(data) ? data[0] : data;
+          setFormData({
+            username: profile?.username || "",
+            password: "",
+            confirmPassword: "",
+            email: profile?.email || "",
+            mobile: profile?.mobile || "",
+          });
+        })
+        .finally(() => setLoadingProfile(false));
+    }
+  }, [editMode, dealerId, open]);
+
   return (
     <Dialog open={open} onOpenChange={handleClose}>
       <DialogContent className="max-w-2xl max-h-[90vh] overflow-y-auto">
         <DialogHeader>
-          <DialogTitle>Create Dealer Profile</DialogTitle>
+          <DialogTitle>{editMode ? "Edit Dealer Profile" : "Create Dealer Profile"}</DialogTitle>
           <DialogDescription>
-            Create login credentials for {dealerName}
+            {editMode ? `Edit profile for ${dealerName}` : `Create login credentials for ${dealerName}`}
           </DialogDescription>
         </DialogHeader>
 
-        {!qrCode ? (
+        {loadingProfile ? (
+          <div className="p-8 text-center text-slate-500">Loading profile...</div>
+        ) : !qrCode || editMode ? (
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid grid-cols-2 gap-4">
               <div className="space-y-2">
